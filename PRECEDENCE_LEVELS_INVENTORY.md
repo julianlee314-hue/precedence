@@ -274,3 +274,10 @@ This is the compact crosswalk of `LIC` in `levels.js`. The number before the dot
 - Treat Eras 1–4 as the first playable structure build; do content refinement against the original demo after the shell is accepted.
 - Turn on and test powers only when Era 6 content is ready; do not infer readiness from the existence of L5/L6 names.
 - Reserve **Nested / Miami Burnout** for the 1.0 milestone.
+
+
+---
+
+## Flight / Hangar (Eras 11–20) — added 3 Oct 2026
+
+Protocol trainers (not PrecEngine op-tap). Each era has 6 stages (Lexicon → Fluency). Eras 11–15: full precalc banks. Eras 16–20: light calc protocol stubs. See `PRECEDENCE_FLIGHT_LADDER_CURRICULUM.md`.

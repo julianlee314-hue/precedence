@@ -1,20 +1,27 @@
 # Precedence
 
-Order-of-operations racer — ten math eras with visual transport rewards.
+Order-of-operations racer — **Road** eras 1–10 plus **Hangar / Flight** eras 11–20.
 
 **Play:** [julianlee314-hue.github.io/precedence](https://julianlee314-hue.github.io/precedence/)
 
-## Status (shell / pre-sprites)
+## Status
+### Road (Eras 1–10)
 - Eras **1–4** playable: **Sums**, **Products**, **Differences**, **Quotients**
-- Eras **5–10** locked math-title placeholders: **Mixed operations**, **Powers**, **Long chains**, **Nested**, **Negatives**, **Fraction bars**
-- Transport is visual-only: the garage and HUD never use vehicle names as era titles
-- Era 8’s neon sports-car treatment is reserved for the future 1.0 build
-- Algebra Licenses wing hidden from this home
-- Road still uses tinted car silhouettes — real vehicles coming next
+- Eras **5–10** locked math-title placeholders (Era 8 Nested = future 1.0 / Miami)
+- Transport is visual-only (Cleopatra litter = visual only, never a title)
+
+### Hangar / Flight (Eras 11–20)
+- **11–15** playable protocol banks (precalc order): Grouping towers · Fraction architecture · Composition order · Trig reading · Exp–log stacks
+- **16–20** playable light protocol stubs (calc): Limits · Derivative · Integral · Series · Several variables
+- 6 stages per era: Lexicon · Trap A · Trap B · Combine · Dense · Fluency
+- Craft silhouettes are visual-only; garage cards show **math titles**
+- Production unlock = clear Era 10; playtest currently open (also interim: Era 4 cleared / Open every level)
 
 ## Docs
+- [STRUCTURE.md](STRUCTURE.md)
 - [Era unlock map](PRECEDENCE_ERA_UNLOCK_MAP.md)
-- [STRUCTURE.md](STRUCTURE.md) — math titles, visual rewards, and engine mapping
+- [Flight ladder curriculum](PRECEDENCE_FLIGHT_LADDER_CURRICULUM.md)
+- [Levels inventory](PRECEDENCE_LEVELS_INVENTORY.md)
 
 ## Build (dev)
 Source lives on the box under `mathera-games/games/precedence/`. `python3 build.py` writes `dist/precedence/index.html`.

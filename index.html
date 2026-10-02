@@ -202,6 +202,22 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .era-sel .eh b{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase}
 .era-sel .eh span{font-family:var(--mono);font-size:11px;color:var(--chalk-dim)}
 .era-sel .eline{font-size:13px;color:var(--chalk-dim)}
+
+/* Flight / Hangar wing */
+.wing-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2px}
+.wing-tab{border:0;border-radius:999px;background:var(--desk-2);box-shadow:inset 0 0 0 1px var(--desk-line);padding:7px 14px;font-family:var(--display);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--chalk-dim)}
+.wing-tab[aria-pressed="true"]{background:var(--card);color:var(--card-ink);box-shadow:inset 0 0 0 2px var(--rule-red),var(--card-shadow)}
+.wing-tab small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;font-weight:400;opacity:.75;text-transform:none}
+.era-garage.flight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:520px){.era-garage.flight-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.era-card.flight{min-height:118px}
+.era-card .sil{display:block;width:100%;height:28px;margin:2px 0 0;opacity:.85}
+.era-card[aria-pressed="true"] .sil{opacity:1}
+.stage-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stage-chip{border:0;border-radius:8px;background:var(--desk-2);box-shadow:inset 0 0 0 1px var(--desk-line);padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--chalk-dim)}
+.stage-chip[aria-pressed="true"]{background:var(--card);color:var(--card-ink);box-shadow:inset 0 0 0 2px var(--hint),var(--card-shadow);color:inherit}
+.stage-chip b{display:block;font-family:var(--display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--chalk)}
+.hangar-note{font-size:12px;color:var(--chalk-dim);margin:0 0 6px}
 /* licenses: a strip of plates, 1 to 14 */
 .plates{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;margin-inline:-2px;padding-inline:2px}
 .plate{flex:0 0 auto;border:0;border-radius:8px;background:var(--desk-2);box-shadow:inset 0 0 0 1px var(--desk-line);padding:6px 10px 7px;text-align:left;display:flex;flex-direction:column;gap:1px;min-width:74px}
@@ -273,9 +289,15 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
   <!-- HOME -->
   <section class="view" id="vHome">
     <div class="plates" id="plates" role="tablist" aria-label="Licenses" hidden></div>
+    <div class="wing-tabs" id="wingTabs" role="tablist" aria-label="Wings">
+      <button class="wing-tab" data-wing="road" aria-pressed="true"><span>Road</span><small>Eras 1–10</small></button>
+      <button class="wing-tab" data-wing="flight" aria-pressed="false"><span>Hangar</span><small>Flight 11–20</small></button>
+    </div>
+    <p class="hangar-note" id="hangarNote" hidden>Flight wing · math titles · craft is visual-only. Unlocks after Fraction bars (Era 10); open for playtest.</p>
     <div class="era-garage" id="eraGarage" role="tablist" aria-label="Eras of getting around"></div>
     <div class="board" id="bench" hidden></div>
     <div class="era-sel" id="eraSel"></div>
+    <div class="stage-row" id="stageRow" hidden></div>
     <div class="lichead" id="licHead"></div>
     <div class="levels" id="levels" hidden></div>
     <div class="lcard" id="licCard" hidden></div>
@@ -560,6 +582,27 @@ const WORLDS = {
     car: { body: '#5c4030', dim: '#2a1a10', glass: '#1a120c', light: '#e8d8b0' }, gate: ['#e8d8b0', '#3a2a18'], tunnel: '#3a2a18', rim: '#8a6a3a', tunnelLight: '#ffd27a', horizon: '#8a6a3a' },
   boston: { sky: ['#1a1e2e', '#2a3048', '#3a4860'], star: '#8a90b0', ground: ['#2a2e28', '#32362e'], road: ['#2c2c30', '#343438'], edge: '#c9a227', edgeOff: '#2c2c30', lane: '#e8e0c8', lamps: true,
     car: { body: '#4a3a2a', dim: '#2a1a10', glass: '#0a0a10', light: '#ffd27a' }, gate: ['#e8e0c8', '#1a1e2e'], tunnel: '#0a0a10', tunnelLight: '#c9a227', horizon: '#c9a227' },
+  // Flight eras 11–20 (sky theme packs; craft silhouettes are postcard-only for now)
+  wright: { sky: ['#87b5d4', '#a8cbe0', '#c9dff0', '#e8f2f8'], cloud: '#ffffff', ground: ['#c2b280', '#b8a878'], road: ['#8a7a5a', '#928262'], edge: '#5a4a2a', edgeOff: '#e8e0c8', lane: '#e8e0c8',
+    car: { body: '#6a5a3a', dim: '#3a2a1a', glass: '#1a120c', light: '#fff4dc' }, gate: ['#fff4dc', '#5a4a2a'], tunnel: '#4a3a22', rim: '#8a7a5a', tunnelLight: '#ffe08a', horizon: '#6a8aaa' },
+  barnstorm: { sky: ['#5a8ab8', '#7aa4c8', '#9cbcd8'], cloud: '#fcfcfc', hills: '#3a7a3a', ground: ['#6aaa4a', '#74b454'], road: ['#5a5a5e', '#626266'], edge: '#d82800', edgeOff: '#fcfcfc', lane: '#fcfcfc',
+    car: { body: '#c8202f', dim: '#6a1018', glass: '#0c0c0c', light: '#fcfcfc' }, gate: ['#fcfcfc', '#1c2228'], tunnel: '#3a3f46', rim: '#d9b964', tunnelLight: '#ffe08a', horizon: '#3a7a3a' },
+  clipper: { sky: ['#1a3a5a', '#2a5078', '#3a6898', '#e8a050'], sea: '#1a4a6a', cloud: '#e8eef4', ground: ['#2a3a4a', '#324252'], road: ['#2c3440', '#343c48'], edge: '#e8c87a', edgeOff: '#2c3440', lane: '#e8eef4',
+    car: { body: '#c9a227', dim: '#6a5010', glass: '#0a1520', light: '#fff1c8' }, gate: ['#e8eef4', '#1a3a5a'], tunnel: '#0a1520', rim: '#e8a050', tunnelLight: '#ffd27a', horizon: '#e8a050' },
+  turkey: { sky: ['#4a6a9a', '#6a88b0', '#8aa8c8', '#f0d8a8'], cloud: '#ffffff', ground: ['#3a5a3a', '#446444'], road: ['#4a4a52', '#52525a'], edge: '#f5e6c8', edgeOff: '#8b1e3f', lane: '#f5e6c8',
+    car: { body: '#8b1e3f', dim: '#4a1020', glass: '#1a120c', light: '#ffe08a' }, gate: ['#f5e6c8', '#2a3a5a'], tunnel: '#2a1a18', rim: '#c9a227', tunnelLight: '#ffe08a', horizon: '#c9a227' },
+  earlyjet: { sky: ['#6a9cc8', '#88b4d8', '#a8cce8'], cloud: '#ffffff', ground: ['#5a6a5a', '#647464'], road: ['#5a5a62', '#62626a'], edge: '#c0c8d0', edgeOff: '#5a5a62', lane: '#e8eef4',
+    car: { body: '#b0b8c0', dim: '#4a5058', glass: '#1a2430', light: '#e8eef4' }, gate: ['#e8eef4', '#2a3a4a'], tunnel: '#2a3038', rim: '#8898a8', tunnelLight: '#c8d8e8', horizon: '#6a9cc8' },
+  concorde: { sky: ['#0a1a2e', '#122848', '#1a3860'], star: '#8a90b0', ground: ['#1a2030', '#222838'], road: ['#2a3040', '#323848'], edge: '#e8e8f0', edgeOff: '#2a3040', lane: '#7ec8ff',
+    car: { body: '#e8e8f0', dim: '#6a7080', glass: '#0a1a2e', light: '#7ec8ff' }, gate: ['#e8e8f0', '#0a1a2e'], tunnel: '#050a14', rim: '#7ec8ff', tunnelLight: '#b8e0ff', horizon: '#7ec8ff' },
+  glasscockpit: { sky: ['#050a18', '#0a1430', '#102048'], star: '#9fb6d8', city: ['#0b1a2a', '#3cf0ff'], ground: ['#0a1020', '#121828'], road: ['#1a2030', '#222838'], edge: '#3cf0ff', edgeOff: '#1a2030', lane: '#3cf0ff',
+    car: { body: '#2a8cff', dim: '#103050', glass: '#050a18', light: '#e8fffb' }, gate: ['#3cf0ff', '#050a18'], tunnel: '#03060e', rim: '#3cf0ff', tunnelLight: '#b3ff3c', horizon: '#3cf0ff' },
+  fighter: { sky: ['#1a4a8a', '#2a6ab0', '#4a8ad0', '#88b8e8'], ground: ['#3a5a3a', '#446444'], road: ['#3a3a42', '#42424a'], edge: '#ff4f3a', edgeOff: '#3a3a42', lane: '#ffd36b',
+    car: { body: '#4a6a4a', dim: '#1a2a1a', glass: '#0a1520', light: '#ffd36b' }, gate: ['#ffd36b', '#1a2a3a'], tunnel: '#0a1520', rim: '#ff4f3a', tunnelLight: '#ffd36b', horizon: '#ff4f3a' },
+  stealth: { sky: ['#020308', '#060a12', '#0a101c'], star: '#4a5060', ground: ['#080a10', '#0c0e14'], road: ['#12151c', '#181b22'], edge: '#2a3038', edgeOff: '#12151c', lane: '#3a4048',
+    car: { body: '#1a1e24', dim: '#0a0c10', glass: '#000', light: '#4a6a4a' }, gate: ['#2a3038', '#020308'], tunnel: '#000', rim: '#1a3020', tunnelLight: '#2a4a2a', horizon: '#1a3020' },
+  drone: { sky: ['#0a1020', '#101830', '#182040'], star: '#6a90b0', ground: ['#101820', '#182028'], road: ['#1a2430', '#222c38'], edge: '#39ff8a', edgeOff: '#1a2430', lane: '#39ff8a', wire: '#0f5a2f',
+    car: { body: '#39ff8a', dim: '#0f5a2f', glass: '#000', light: '#c8ffe0' }, gate: ['#39ff8a', '#0a1020'], tunnel: '#000', rim: '#39ff8a', tunnelLight: '#39ff8a', horizon: '#39ff8a' },
   // the Fractions app: strawberry sky, shopfronts, a chocolate road with icing lines
   bakery: { sky: ['#ffc2d1', '#ffd3de', '#ffe2e8', '#fff0ea'], cloud: '#fffaf4', mesas: ['#e8a0b4', '#f4cfa0'], ground: ['#f2d49c', '#ecc98c'], road: ['#6b4636', '#74503f'], edge: '#ff6f91', edgeOff: '#fff7ec', lane: '#fff7ec',
     car: { body: '#2bb59a', dim: '#125a4c', glass: '#3a2418', light: '#fff7ec' }, gate: ['#fff7ec', '#6b4636'], tunnel: '#4a2e22', rim: '#ff6f91', tunnelLight: '#ffe08a', horizon: '#e8a0b4' }
@@ -5997,6 +6040,689 @@ G.Levels.def({ '2.laws': laws, '2.negbase': negbase, '2.negfrac': negfrac, '2.sc
 
 </script>
 <script>
+/* Flight ladder (Eras 11–20): tap the next legal structural move — arithmetic not the point. */
+(function (G) {
+'use strict';
+const STAGES = [
+  { id: 'lexicon', name: 'Lexicon' },
+  { id: 'trapA', name: 'Trap A' },
+  { id: 'trapB', name: 'Trap B' },
+  { id: 'combine', name: 'Combine' },
+  { id: 'dense', name: 'Dense' },
+  { id: 'fluency', name: 'Fluency' }
+];
+const R = () => Math.random();
+const pick = a => a[Math.floor(R() * a.length)];
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+
+function Q(prompt, right, wrongs, move) {
+  return {
+    prompt,
+    opts: [{ html: right, ok: true, move: move || 'Next.' }].concat(
+      wrongs.map(w => typeof w === 'string' ? { html: w, ok: false, why: 'Not the next legal move.' } : { html: w.html, ok: false, why: w.why })
+    )
+  };
+}
+
+/* ---------- Era 11 · Grouping towers ---------- */
+const E11 = {
+  lexicon: [
+    Q('√(4 + 5)', 'Evaluate inside the radical first', [
+      { html: '√4 + √5', why: '√ does not distribute over +.' },
+      { html: '√4 + 5', why: 'The radical covers the whole sum.' },
+      { html: 'Square both sides first', why: 'There is nothing to square yet — open the grouping.' }
+    ], 'Innermost grouping first'),
+    Q('|3 − (1 + 2)|', 'Compute (1 + 2) first', [
+      { html: '|3| − |(1 + 2)|', why: 'Absolute value does not split over subtraction.' },
+      { html: '3 − 1 + 2, then abs', why: 'The inner parentheses bind first.' },
+      { html: 'Drop the bars, then subtract', why: 'Bars are grouping — resolve inside first.' }
+    ], 'Parentheses inside abs'),
+    Q('√|9 − 5|', 'Evaluate |9 − 5| first', [
+      { html: '√9 − √5', why: 'Wrong both ways: abs and radical order.' },
+      { html: '√9 − 5', why: 'The radical covers the absolute value.' },
+      { html: '|√9 − 5|', why: 'Abs is inside the radical, not outside.' }
+    ], 'Abs inside radical')
+  ],
+  trapA: [
+    Q('√(a + b)  —  first move?', 'Leave as √(a + b) until a+b is one value', [
+      { html: '√a + √b', why: 'Classic fail: radical does not distribute over +.' },
+      { html: '√a + b', why: 'The radicand is the whole sum.' },
+      { html: 'a + √b', why: 'Same trap, other side.' }
+    ], 'Do not split the radical'),
+    Q('√(9 × 4)', '√9 × √4 is legal (product rule)', [
+      { html: '√9 + √4', why: 'Product, not sum — + would be wrong.' },
+      { html: '9 × √4', why: 'The radical covers both factors.' },
+      { html: '√9 × 4', why: 'Both factors sit under the radical.' }
+    ], 'Product under a radical may split')
+  ],
+  trapB: [
+    Q('|x − 3| = 5  —  first structural move?', 'Split into x − 3 = 5 or x − 3 = −5', [
+      { html: 'x − 3 = 5 only', why: 'Abs equals positive: two cases.' },
+      { html: '|x| − |3| = 5', why: 'Abs does not split over −.' },
+      { html: 'x − 3 = 5, then square', why: 'No squaring needed yet.' }
+    ], 'Definition of absolute value'),
+    Q('−(2 − 5)  —  next?', 'Distribute the outer minus: −2 + 5', [
+      { html: '−2 − 5', why: 'Minus in front flips every sign inside.' },
+      { html: '2 − 5, drop the outer minus', why: 'The outer grouping with a leading minus matters.' },
+      { html: '|2 − 5|', why: 'Parentheses are not absolute value.' }
+    ], 'Outer minus is grouping')
+  ],
+  combine: [
+    Q('√|4 − (2 + 3)|', 'Innermost: (2 + 3)', [
+      { html: '√|4| − √|(2 + 3)|', why: 'Neither radical nor abs splits that way.' },
+      { html: '|√4 − (2 + 3)|', why: 'Wrong nesting order.' },
+      { html: '√|4 − 2| + 3', why: 'The +3 is inside the inner parentheses.' }
+    ], 'Deepest parentheses first'),
+    Q('|√(16 − 7)|', 'Inside radical: 16 − 7', [
+      { html: '|√16 − √7|', why: 'Radical does not split over −.' },
+      { html: '√|16| − |7|', why: 'Abs wraps the whole radical.' },
+      { html: '|16 − 7| then √ outside', why: '√ is inside the bars.' }
+    ], 'Radical inside abs')
+  ],
+  dense: [
+    Q('√( |3 − (1 + |2 − 5|)| )', 'Innermost: |2 − 5|', [
+      { html: '(1 + |2 − 5|) first, ignore inner abs', why: 'The abs around 2−5 is deeper.' },
+      { html: '√3 − (1 + …)', why: 'Radical covers the whole tower.' },
+      { html: 'Work left to right ignoring bars', why: 'Grouping towers: depth beats left-to-right.' }
+    ], 'Deepest abs first'),
+    Q('||x| − 3|  —  next focus?', 'Resolve the inner |x| first', [
+      { html: 'Treat as |x − 3|', why: 'Outer abs wraps |x| − 3, not x − 3.' },
+      { html: 'Drop both bars', why: 'Each layer is its own grouping.' },
+      { html: 'Outer abs first', why: 'Innermost grouping first.' }
+    ], 'Nested abs: inside out')
+  ],
+  fluency: [
+    Q('√(a + b)²  (a+b ≥ 0)  —  next?', '√( )² undoes to |a + b|, then drop abs if nonnegative', [
+      { html: 'a + b immediately with no abs thought', why: '√ of a square is absolute value.' },
+      { html: 'a² + b²', why: 'Square of a sum is not sum of squares — and you have √ outside.' },
+      { html: '(√a + √b)²', why: 'Wrong rewrite of the radicand.' }
+    ], '√(square) → abs'),
+    Q('(√(9 + 16))²', 'Inside radical first: 9 + 16', [
+      { html: '√9² + √16²', why: 'Do not distribute.' },
+      { html: '9 + 16 without radical, then square', why: 'Radical is still there until you evaluate inside.' },
+      { html: '(√9 + √16)²', why: '√(sum) ≠ sum of √.' }
+    ], 'Grouping before undoing')
+  ]
+};
+
+/* ---------- Era 12 · Fraction architecture ---------- */
+const E12 = {
+  lexicon: [
+    Q('<span class="fr"><span>a</span><span>b</span></span> + <span class="fr"><span>c</span><span>d</span></span>  —  first?', 'Find a common denominator (architecture), do not cancel across +', [
+      { html: 'Cancel a with b', why: 'Nothing cancels across addition.' },
+      { html: 'Cancel b with d', why: 'Bottoms only meet after a common denominator.' },
+      { html: 'a/b + c/d = (a+c)/(b+d)', why: 'Classic wrong: never add tops and bottoms.' }
+    ], 'Bars bind; + does not cancel'),
+    Q('<span class="fr"><span><span class="fr"><span>a</span><span>b</span></span></span><span>c</span></span>  —  which bar is main?', 'Main bar is the longer/outer: (a/b) ÷ c', [
+      { html: 'Treat as a / (b/c)', why: 'Stack reading: top complex over c means (a/b)/c.' },
+      { html: 'Cancel b and c first', why: 'See the main vinculum before cancelling.' },
+      { html: 'a − b − c', why: 'These are fractions, not a difference chain.' }
+    ], 'Main vinculum first')
+  ],
+  trapA: [
+    Q('<span class="fr"><span>x + 2</span><span>x</span></span>  —  next?', 'Cannot cancel the x across +', [
+      { html: 'Cancel x → 1 + 2', why: 'x is not a factor of the whole top.' },
+      { html: 'Cancel x → 2', why: 'Same illegal cancel.' },
+      { html: 'Split into x/x + 2/x', why: 'Legal split — but only if you keep both terms: 1 + 2/x, not cancel first.' }
+    ], 'No cancel across addition'),
+    Q('<span class="fr"><span>6x</span><span>3x</span></span>', 'Cancel common factor 3x → 2', [
+      { html: 'Cancel only the 3 → 2x/x', why: 'Whole common factor may cancel.' },
+      { html: '6x / 3x = 6/3x', why: 'Both x factors cancel.' },
+      { html: 'Leave as 6x/3 + x', why: 'One fraction bar, not a sum.' }
+    ], 'Factors cancel; terms do not')
+  ],
+  trapB: [
+    Q('1 ÷ <span class="fr"><span>a</span><span>b</span></span>', 'Multiply by reciprocal: 1 × (b/a)', [
+      { html: '1/a ÷ b', why: 'Dividing by a fraction ≠ divide top only.' },
+      { html: 'b/a then invert again', why: 'One reciprocal is enough.' },
+      { html: '1 − a/b', why: 'Division, not subtraction.' }
+    ], '÷ fraction → × reciprocal'),
+    Q('<span class="fr"><span>1 + <span class="fr"><span>1</span><span>x</span></span></span><span>x</span></span>  —  first floor?', 'Combine the top complex: 1 + 1/x', [
+      { html: 'Cancel the two x bottoms', why: 'Different floors — main bar still there.' },
+      { html: 'Write as 1/x + 1/x', why: 'Top is 1 + 1/x, not 1/x + 1/x.' },
+      { html: 'Invert the whole fraction first', why: 'Simplify the complex top first.' }
+    ], 'Complex fraction: top floor first')
+  ],
+  combine: [
+    Q('<span class="fr"><span><span class="fr"><span>1</span><span>2</span></span> + <span class="fr"><span>1</span><span>3</span></span></span><span><span class="fr"><span>1</span><span>6</span></span></span></span>', 'Main bar: (½ + ⅓) ÷ (⅙)', [
+      { html: '(½ + ⅓) × ⅙', why: 'Dividing by a fraction multiplies by reciprocal — but first identify the main bar.' },
+      { html: '½ + ⅓ / ⅙ left to right', why: 'The long bar groups the sum on top.' },
+      { html: 'Cancel 6 with 2 and 3', why: 'See architecture before cancelling.' }
+    ], 'Long bar is the ÷'),
+    Q('<span class="fr"><span>a</span><span>b</span></span> ÷ <span class="fr"><span>c</span><span>d</span></span>', 'Rewrite as <span class="fr"><span>a</span><span>b</span></span> × <span class="fr"><span>d</span><span>c</span></span>', [
+      { html: '(a÷c)/(b÷d)', why: 'Not the reciprocal multiply rule.' },
+      { html: 'a/b × c/d', why: 'Second fraction flips.' },
+      { html: 'ad / bc then cancel blindly across leftover +', why: 'No + here — but order is reciprocal first.' }
+    ], 'Division of fractions')
+  ],
+  dense: [
+    Q('<span class="fr"><span>1</span><span>1 + <span class="fr"><span>1</span><span>1 + <span class="fr"><span>1</span><span>x</span></span></span></span></span></span>  —  next?', 'Innermost: 1 + 1/x', [
+      { html: 'Outer reciprocal first', why: 'Continued fraction: deepest floor first.' },
+      { html: 'Cancel every 1', why: 'Structure before arithmetic.' },
+      { html: 'Write as 1 − 1 − 1/x', why: 'These are nested fractions, not differences.' }
+    ], 'Continued fraction inside-out'),
+    Q('<span class="fr"><span>x</span><span>y</span></span> − <span class="fr"><span>y</span><span>x</span></span>', 'Common denominator xy before combining', [
+      { html: 'Cancel x and y across the −', why: 'No cancel across subtraction.' },
+      { html: '(x−y)/(y−x)', why: 'Need common denominator first; also watch signs.' },
+      { html: 'xy − yx = 0 on top', why: 'Tops need matching bottoms before combining.' }
+    ], 'Common bar for difference')
+  ],
+  fluency: [
+    Q('(<span class="fr"><span>a</span><span>b</span></span>)<sup>−1</sup>', 'Reciprocal: b/a', [
+      { html: '−a/b', why: 'Inverse of a fraction is reciprocal, not negation.' },
+      { html: 'a/−b', why: 'Same trap.' },
+      { html: '1/(a/b) then stop without flipping', why: '1/(a/b) = b/a — finish the flip.' }
+    ], 'Negative exponent on a fraction'),
+    Q('<span class="fr"><span>2/3</span><span>4/5</span></span>', 'Main bar → (2/3) ÷ (4/5) = (2/3)×(5/4)', [
+      { html: '2/3 × 4/5', why: 'Bottom fraction flips.' },
+      { html: '(2÷4)/(3÷5)', why: 'Prefer reciprocal multiply; this needs care with integers.' },
+      { html: '2/3 − 4/5', why: 'Complex fraction means ÷, not −.' }
+    ], 'Stacked simple fractions')
+  ]
+};
+
+/* ---------- Era 13 · Composition order ---------- */
+const E13 = {
+  lexicon: [
+    Q('f(g(x))  —  which runs first?', 'g first, then f', [
+      { html: 'f first, then g', why: 'Composition reads inside-out: g then f.' },
+      { html: 'Either order — functions commute', why: 'Composition rarely commutes.' },
+      { html: 'f and g at the same time', why: 'One input path: inside first.' }
+    ], 'Inside function first'),
+    Q('(f ∘ g)(x)', 'Same as f(g(x)) — g then f', [
+      { html: 'g(f(x))', why: '∘ is not reverse order.' },
+      { html: 'f(x) ∘ g(x)', why: 'Compose functions, not values with ∘.' },
+      { html: 'f(x) · g(x)', why: 'Composition ≠ product.' }
+    ], '∘ means f after g')
+  ],
+  trapA: [
+    Q('f(x)=x+1, g(x)=2x. Find f(g(3)). Next?', 'g(3)=6 first', [
+      { html: 'f(3)=4 first', why: 'Asked f(g(3)), not g(f(3)).' },
+      { html: 'f(g)=2x+1 as a formula, plug 3 later without order care', why: 'Order is fine if composition is built correctly — but first evaluate inside.' },
+      { html: '3 then +1 then ×2', why: 'That is g(f(3)).' }
+    ], 'Evaluate inside'),
+    Q('Same f,g. Find g(f(3)). Next?', 'f(3)=4 first', [
+      { html: 'g(3)=6 first', why: 'Now the inside is f.' },
+      { html: 'Same as f(g(3))', why: 'Different order → different value.' },
+      { html: 'Skip to 2(3+1) without naming inside', why: 'OK algebraically, but the skill is seeing which is inside.' }
+    ], 'Other order')
+  ],
+  trapB: [
+    Q('f<sup>−1</sup>(f(x))  —  next idea?', 'Undo: simplifies toward x (when defined)', [
+      { html: 'f(f(x))', why: 'Inverse undoes; it does not compose the same way twice.' },
+      { html: '1/f(x)', why: 'Inverse function ≠ reciprocal.' },
+      { html: 'f(x)<sup>−1</sup> as 1/f(x)', why: 'Parentheses: f<sup>−1</sup> means inverse.' }
+    ], 'Inverse undoes'),
+    Q('(f ∘ g)<sup>−1</sup>', 'g<sup>−1</sup> ∘ f<sup>−1</sup> (reverse order)', [
+      { html: 'f<sup>−1</sup> ∘ g<sup>−1</sup>', why: 'Socks-shoes: reverse the order.' },
+      { html: '1/(f∘g)', why: 'Inverse function, not reciprocal.' },
+      { html: '(f ∘ g) still', why: 'Inverse changes the composition.' }
+    ], 'Inverse of composition reverses')
+  ],
+  combine: [
+    Q('h(x)=f(g(h(x))) wait — read f(g(h(x))). Order?', 'h, then g, then f', [
+      { html: 'f, then g, then h', why: 'Inside-out, not left-to-right on the names.' },
+      { html: 'f and h first (ends), then g', why: 'One pipeline: innermost first.' },
+      { html: 'Any order', why: 'Order is fixed by nesting.' }
+    ], 'Triple composition'),
+    Q('f(x)=√x, g(x)=x−4. Domain sense for f(g(x)): next check?', 'Need g(x)≥0 before f', [
+      { html: 'Need x≥0 only', why: '√ sees g(x), so x−4≥0.' },
+      { html: 'Need f(x)≥0', why: 'Outside is f of g, not f alone.' },
+      { html: 'No domain issues', why: 'Composition inherits inside range restrictions.' }
+    ], 'Inside range feeds outside')
+  ],
+  dense: [
+    Q('(f ∘ g ∘ h)(x) vs (h ∘ g ∘ f)(x)', 'Different pipelines — not equal in general', [
+      { html: 'Always equal', why: 'Composition is not commutative.' },
+      { html: 'Equal if you cancel g', why: 'Cannot cancel the middle arbitrarily.' },
+      { html: 'Differ only by a constant', why: 'Order can change the function completely.' }
+    ], 'Order is the function'),
+    Q('f(g(x))=x and g(f(x))=x. Next reading?', 'f and g are inverses', [
+      { html: 'f = g', why: 'Inverses undo; they need not be the same map.' },
+      { html: 'f(g)=g(f) only at one x', why: 'The identities hold as functions.' },
+      { html: 'f∘g is zero', why: 'Identity, not zero.' }
+    ], 'Two-sided inverse')
+  ],
+  fluency: [
+    Q('Compute (f ∘ g)<sup>−1</sup>(y) structure', 'Apply f<sup>−1</sup> first? No — apply g<sup>−1</sup> after f<sup>−1</sup>: y → f<sup>−1</sup> → g<sup>−1</sup>', [
+      { html: 'y → g<sup>−1</sup> → f<sup>−1</sup>', why: 'Socks-shoes: undo f first (it was last), then undo g.' },
+      { html: 'y → f → g', why: 'That is forward composition, not inverse.' },
+      { html: '1/y then compose', why: 'Wrong notion of inverse.' }
+    ], 'Undo last first'),
+    Q('f(x)=2x+1. First step to build f<sup>−1</sup>?', 'Swap roles: set y=2x+1, solve for x', [
+      { html: 'Reciprocal 1/(2x+1)', why: 'Inverse function ≠ reciprocal.' },
+      { html: 'Negate: −2x−1', why: 'Not how inverses work.' },
+      { html: 'Divide by 2 only: x+1/2', why: 'Must undo +1 as well — and swap variables carefully.' }
+    ], 'Inverse algebra order')
+  ]
+};
+
+/* ---------- Era 14 · Trig reading ---------- */
+const E14 = {
+  lexicon: [
+    Q('sin²x means…', '(sin x)²', [
+      { html: 'sin(sin x)', why: 'sin² is power on the value, not composition.' },
+      { html: 'sin(x²)', why: 'Exponent on sin binds to the function value; x² would be written sin(x²).' },
+      { html: '2 sin x', why: 'Squared, not doubled.' }
+    ], 'sin²x = (sin x)²'),
+    Q('sin(x²) means…', 'sine of (x squared)', [
+      { html: '(sin x)²', why: 'That is sin²x.' },
+      { html: 'sin²(x²)', why: 'Extra square on sine.' },
+      { html: 'x² sin', why: 'sin is the function applying to x².' }
+    ], 'Power on the input')
+  ],
+  trapA: [
+    Q('sin⁻¹x means…', 'arcsine (inverse function)', [
+      { html: '1/sin x', why: 'That is csc x; sin⁻¹ is inverse trig in this notation.' },
+      { html: '(sin x)⁻¹ as reciprocal only', why: 'Standard precalc: sin⁻¹ = arcsin.' },
+      { html: 'sin(1/x)', why: 'Wrong placement of inverse.' }
+    ], 'sin⁻¹ = arcsin'),
+    Q('csc x vs sin⁻¹x', 'csc = 1/sin; sin⁻¹ = arcsin — different', [
+      { html: 'They are the same', why: 'Reciprocal ≠ inverse function.' },
+      { html: 'csc is arcsin', why: 'csc is reciprocal.' },
+      { html: 'sin⁻¹ is 1/sin', why: 'Common exam fail.' }
+    ], 'Reciprocal vs inverse')
+  ],
+  trapB: [
+    Q('cos²(2x)', '(cos(2x))²', [
+      { html: 'cos(cos(2x))', why: '² is power, not composition.' },
+      { html: 'cos²(2) · x', why: '2x is the angle.' },
+      { html: 'cos((2x)²)', why: 'Square is on cos value, not on 2x.' }
+    ], 'Power after the angle'),
+    Q('tan⁻¹(x²)', 'arctan of x²', [
+      { html: '(tan x²)⁻¹ reciprocal', why: 'tan⁻¹ denotes arctan.' },
+      { html: 'tan⁻¹x then square', why: 'x² is the input to arctan.' },
+      { html: '(arctan x)²', why: 'Parentheses would be needed for that.' }
+    ], 'Inverse of a powered input')
+  ],
+  combine: [
+    Q('sin²(x²)', '(sin(x²))²', [
+      { html: 'sin(sin(x²))', why: '² on sin is power.' },
+      { html: '(sin x)² then square x', why: 'x² is inside the sine.' },
+      { html: 'sin²x² meaning (sin²x)·x', why: 'Parse as sin²(x²).' }
+    ], 'Both power and composition'),
+    Q('sin⁻¹(sin x) for x in range', 'Simplifies toward x (principal range care)', [
+      { html: 'Always 1', why: 'Inverse undoes on the principal range, not to 1.' },
+      { html: 'sin(sin⁻¹x) is different issue — same always', why: 'Different composition order.' },
+      { html: 'csc(sin x)', why: 'Wrong inverse notion.' }
+    ], 'Inverse undoes sine')
+  ],
+  dense: [
+    Q('Read: cos²x + sin²x vs cos(x²) + sin(x²)', 'First is Pythagorean in x; second is different functions of x²', [
+      { html: 'Always equal', why: 'cos²x+sin²x=1; cos(x²)+sin(x²) is not 1.' },
+      { html: 'Differ by a factor x', why: 'Completely different expressions.' },
+      { html: 'Second is the square of the first', why: 'No.' }
+    ], 'Notation changes identity'),
+    Q('sec²x vs 1/cos²x vs cos⁻²x', 'All three can mean (cos x)⁻² — check local notation; sec²x = 1/cos²x', [
+      { html: 'cos⁻²x must mean arccos(arccos x)', why: 'Negative exponent on cos is reciprocal power, not iterated inverse.' },
+      { html: 'sec²x = sec(sec x)', why: '² is power.' },
+      { html: '1/cos²x = 1/cos(x²)', why: 'Denominator is (cos x)².' }
+    ], 'sec² literacy')
+  ],
+  fluency: [
+    Q('sin 2x vs 2 sin x', 'sin(2x) ≠ 2 sin x in general', [
+      { html: 'Always equal', why: 'Double-angle is 2 sin x cos x, not 2 sin x.' },
+      { html: 'sin 2x means (sin 2)·x', why: 'Juxtaposition is function of 2x.' },
+      { html: '2 sin x means sin(2x)', why: 'Coefficient vs angle.' }
+    ], 'Coefficient vs angle'),
+    Q('arcsin²x parse', 'Usually (arcsin x)²', [
+      { html: 'arcsin(arcsin x)', why: '² denotes power on the value.' },
+      { html: 'arcsin(x²)', why: 'Would be written arcsin(x²).' },
+      { html: '1/(arcsin x)²', why: 'No reciprocal unless −2.' }
+    ], 'Inverse-trig power')
+  ]
+};
+
+/* ---------- Era 15 · Exp–log stacks ---------- */
+const E15 = {
+  lexicon: [
+    Q('log(a^b)  —  next law move?', 'b · log a  (power out front)', [
+      { html: '(log a)^b', why: 'Log of a power ≠ power of a log.' },
+      { html: 'log a + log b', why: 'That is log(ab), not log(a^b).' },
+      { html: 'log(a·b)', why: 'Wrong expansion.' }
+    ], 'Log of power'),
+    Q('(log a)^b  —  reading?', 'Power of a log — do not pull b out as a multiplier', [
+      { html: 'b · log a', why: 'That would be log(a^b), different parentheses.' },
+      { html: 'log(a^b)', why: 'Parentheses make power outside the log.' },
+      { html: 'log a / log b', why: 'Change of base looks different.' }
+    ], 'Power of log')
+  ],
+  trapA: [
+    Q('log(a+b)', 'Cannot split into log a + log b', [
+      { html: 'log a + log b', why: 'Classic fail: log of sum ≠ sum of logs.' },
+      { html: 'log a · log b', why: 'Still wrong.' },
+      { html: 'log a − log b', why: 'That is log(a/b).' }
+    ], 'No log of sum split'),
+    Q('e^{ln x}', 'Simplifies toward x (x>0)', [
+      { html: 'e · ln x', why: 'Exponentiation, not multiplication.' },
+      { html: 'ln(e^x)', why: 'Different order — also → x, but not this expression.' },
+      { html: '1/x', why: 'Inverse undoes, not reciprocal.' }
+    ], 'Exp undoes ln')
+  ],
+  trapB: [
+    Q('log_b a  —  change of base next?', '(ln a)/(ln b)  (or any same-base logs)', [
+      { html: 'ln(a/b)', why: 'Change of base is a quotient of logs, not log of quotient.' },
+      { html: 'ln(a−b)', why: 'Wrong.' },
+      { html: 'b^{log a}', why: 'Different identity.' }
+    ], 'Change of base as regroup'),
+    Q('ln(a/b)', 'ln a − ln b', [
+      { html: 'ln a / ln b', why: 'That is change-of-base shape, not log of quotient.' },
+      { html: 'ln a + ln b', why: 'Quotient → difference.' },
+      { html: 'ln(a−b)', why: 'No.' }
+    ], 'Log of quotient')
+  ],
+  combine: [
+    Q('log((a^b)^c)', 'First: a^{bc}, or bring powers out carefully', [
+      { html: 'b·c·log a as one jump without seeing nesting', why: 'Legal eventually — but see (a^b)^c = a^{bc} structure.' },
+      { html: '(log a)^{b^c}', why: 'Power is on a, inside the log.' },
+      { html: 'log a^{b+c}', why: 'Exponents multiply when powering a power.' }
+    ], 'Power tower inside log'),
+    Q('b^{log_b x}', '→ x (x>0)', [
+      { html: 'log_b(b^x)', why: 'Swapped — also → x, but read this one as exp of log.' },
+      { html: 'x^b', why: 'Wrong.' },
+      { html: 'b·x', why: 'Not multiplication.' }
+    ], 'Base^log undoes')
+  ],
+  dense: [
+    Q('ln(e^{2x+1})', '2x+1 (exp-log undo)', [
+      { html: 'e^{2x+1} then ln later', why: 'Already composed — undo directly.' },
+      { html: '2x+1 then e', why: 'ln already outside.' },
+      { html: 'ln e + ln(2x+1)', why: 'ln(e^{something}) ≠ ln e + …' }
+    ], 'Undo stack'),
+    Q('log(a^b / c^d)', 'b log a − d log c', [
+      { html: 'b log a / d log c', why: 'Quotient of logs is change-of-base, not this expansion.' },
+      { html: 'log(a^b) / log(c^d)', why: 'Same trap.' },
+      { html: 'b/d · log(a/c)', why: 'Not how the powers distribute.' }
+    ], 'Expand with order')
+  ],
+  fluency: [
+    Q('Solve structure: log(x−1) − log(x+1) = 2. Next?', 'Combine: log((x−1)/(x+1)) = 2', [
+      { html: 'log(x−1 − (x+1)) = 2', why: 'Difference of logs ≠ log of difference.' },
+      { html: 'log(x−1) = 2 + log(x+1) then stop without combining option', why: 'Combining first is the clean order move.' },
+      { html: '(x−1)/(x+1) = 2 without undoing log', why: 'Need same base exponential undo after one log.' }
+    ], 'Combine logs first'),
+    Q('e^{2 ln x}', 'x² (for x>0)', [
+      { html: '2e^{ln x}', why: 'Coefficient in exponent is power, not factor outside.' },
+      { html: 'e^2 · ln x', why: 'Wrong reading of the stack.' },
+      { html: '2x', why: 'e^{2 ln x} = (e^{ln x})² = x².' }
+    ], 'Exp of log-power')
+  ]
+};
+
+/* ---------- Eras 16–20 · calc protocol stubs (playable, lighter banks) ---------- */
+const E16 = {
+  lexicon: [
+    Q('lim<sub>x→2</sub> (x²−4)/(x−2)  —  first?', 'Factor numerator, then cancel (x−2)', [
+      { html: 'Plug in x=2 immediately', why: '0/0 — algebra first.' },
+      { html: 'Cancel x² with x', why: 'Not common factors.' },
+      { html: 'L’Hôpital first always', why: 'Factoring is the intended structure move here.' }
+    ], 'Factor → cancel → plug'),
+    Q('lim<sub>x→∞</sub> (3x²+1)/(5x²−2)  —  first?', 'Dominant terms: 3x²/5x²', [
+      { html: 'Plug ∞ into every term raw', why: '∞/∞ — compare degrees / dominant terms.' },
+      { html: 'Cancel only the constants', why: 'Leading terms drive the limit.' },
+      { html: 'Differentiate top and bottom first', why: 'Optional later; dominant term is the structure read.' }
+    ], 'Dominant term')
+  ],
+  trapA: [
+    Q('lim (sin x)/x as x→0. Illegal next?', 'Do not cancel sin with x as if sin x = x algebraically without limit lore', [
+      { html: 'Use standard limit sin x / x → 1', why: 'That is the legal known limit — the trap is fake-cancelling.' },
+      { html: 'Multiply by conjugate of something unrelated', why: 'No conjugate here.' },
+      { html: 'Replace sin x with x inside without justification label', why: 'Need the standard limit or squeeze — not silent cancel.' }
+    ], 'Known limit vs fake cancel')
+  ],
+  trapB: [
+    Q('lim<sub>x→0</sub> (√(x+1)−1)/x  —  next?', 'Multiply by conjugate of the numerator', [
+      { html: 'Plug x=0', why: '0/0 form.' },
+      { html: 'Cancel √x with x', why: 'Not how radicals cancel.' },
+      { html: 'Square the whole fraction', why: 'Breaks the limit equality.' }
+    ], 'Conjugate')
+  ],
+  combine: [
+    Q('After cancelling (x−2) in (x−2)(x+2)/(x−2), next?', 'Simplify to x+2, then plug x→2', [
+      { html: 'Plug before cancelling', why: 'Order: cancel first when factor allows.' },
+      { html: 'Leave hole and stop', why: 'Removable — finish the plug on the simplified expression.' },
+      { html: 'Differentiate', why: 'Not needed.' }
+    ], 'Cancel then plug')
+  ],
+  dense: [
+    Q('lim<sub>x→0</sub> (1/x − 1/sin x) structure', 'Common denominator before combining', [
+      { html: 'Separate into two limits that each diverge and subtract ∞−∞ casually', why: '∞−∞ indeterminate — combine first.' },
+      { html: 'Cancel x and sin x immediately', why: 'Need a single fraction.' },
+      { html: 'Plug 0', why: 'Undefined separately.' }
+    ], 'Combine indeterminate difference')
+  ],
+  fluency: [
+    Q('Piecewise limit: left and right disagree. Next conclusion?', 'Limit does not exist', [
+      { html: 'Average the one-sided limits', why: 'No.' },
+      { html: 'Use the larger one', why: 'Two-sided needs both equal.' },
+      { html: 'Plug the point’s function value', why: 'Limit ≠ value; and sides disagree anyway.' }
+    ], 'One-sided agreement')
+  ]
+};
+
+const E17 = {
+  lexicon: [
+    Q('d/dx [f(g(x))]  —  which rule?', 'Chain: f′(g(x)) · g′(x)', [
+      { html: 'Product: f′ g′', why: 'Composition → chain, not product.' },
+      { html: 'f′(g(x)) only, drop g′', why: 'Missing inner derivative.' },
+      { html: 'Quotient rule', why: 'Not a quotient.' }
+    ], 'Chain rule'),
+    Q('d/dx [u·v]', 'Product: u′v + uv′', [
+      { html: 'u′v′', why: 'Product is not derivative of each multiplied only.' },
+      { html: 'Chain on u then ignore v', why: 'Both factors matter.' },
+      { html: 'u/v rule', why: 'Product, not quotient.' }
+    ], 'Product rule')
+  ],
+  trapA: [
+    Q('d/dx [sin(x²)]', 'cos(x²) · 2x', [
+      { html: 'cos(x²)', why: 'Missing chain on x².' },
+      { html: 'cos(2x)', why: 'Derivative of inner is 2x, not rewriting angle to 2x.' },
+      { html: '−sin(x²)·2x', why: 'Derivative of sin is cos.' }
+    ], 'Chain on trig')
+  ],
+  trapB: [
+    Q('d/dx [x / sin x]', 'Quotient: (sin x − x cos x)/sin²x', [
+      { html: 'Product treating 1/sin as forgetful', why: 'Quotient (or product with csc) — do not skip.' },
+      { html: '1/cos x', why: 'Wrong.' },
+      { html: 'cos x / x', why: 'Swapped roles.' }
+    ], 'Quotient vs product')
+  ],
+  combine: [
+    Q('d/dx [e^{u(x)}]', 'e^{u} · u′', [
+      { html: 'e^{u′}', why: 'Chain: factor e^u times u′.' },
+      { html: 'u′ only', why: 'Missing e^u.' },
+      { html: 'e · u′', why: 'Base is e^{u}, not e.' }
+    ], 'Exp chain')
+  ],
+  dense: [
+    Q('d/dx [ln(f(x))]', 'f′/f', [
+      { html: '1/f′', why: 'Chain: 1/f · f′.' },
+      { html: 'ln(f′)', why: 'No.' },
+      { html: 'f′ only', why: 'Missing ÷ f.' }
+    ], 'Log chain')
+  ],
+  fluency: [
+    Q('Order for y = (x²+1)⁵ sin x. Next rule pick?', 'Product, and the left factor needs chain', [
+      { html: 'Quotient only', why: 'It is a product.' },
+      { html: 'Chain only on the whole thing as one composition', why: 'Outer structure is product.' },
+      { html: 'Differentiate sin first and drop the power', why: 'Both factors.' }
+    ], 'Product + chain')
+  ]
+};
+
+const E18 = {
+  lexicon: [
+    Q('∫ 2x(x²+1)⁵ dx  —  first recognition?', 'u-sub: u = x²+1', [
+      { html: 'Integration by parts first', why: 'Look for derivative of inside sitting outside.' },
+      { html: 'Partial fractions', why: 'Not rational split here.' },
+      { html: 'Expand (x²+1)⁵ fully first always', why: 'u-sub is shorter.' }
+    ], 'u-sub recognition'),
+    Q('∫ x e^x dx  —  first?', 'Parts: u=x, dv=e^x dx', [
+      { html: 'u-sub u=e^x', why: 'No x′ factor matching.' },
+      { html: 'Partial fractions', why: 'Not applicable.' },
+      { html: 'Write as ∫ e^{x²}', why: 'Wrong rewrite.' }
+    ], 'Parts recognition')
+  ],
+  trapA: [
+    Q('∫ (x²)/(x²+1) dx structure', 'Rewrite: 1 − 1/(x²+1) before integrating', [
+      { html: 'u = x²+1 immediately without rewrite', why: 'Numerator is almost denominator — divide first.' },
+      { html: 'Parts with u=x²', why: 'Algebraic rewrite is cleaner.' },
+      { html: 'Partial fractions over reals with linear only', why: 'After rewrite you get arctan.' }
+    ], 'Rewrite first')
+  ],
+  trapB: [
+    Q('∫ ln x dx  —  technique?', 'Parts: u=ln x, dv=dx', [
+      { html: 'u-sub u=ln x', why: 'Need 1/x from du — not present alone.' },
+      { html: 'Known as 1/x', why: 'That is derivative of ln, not integral.' },
+      { html: 'Partial fractions', why: 'No.' }
+    ], 'Parts for ln')
+  ],
+  combine: [
+    Q('∫ sin(x) cos(x) dx  —  next?', 'u=sin x (or double-angle rewrite)', [
+      { html: 'Parts only', why: 'u-sub works immediately.' },
+      { html: 'Partial fractions', why: 'No.' },
+      { html: 'Divide by cos²', why: 'Unnecessary.' }
+    ], 'Trig u-sub')
+  ],
+  dense: [
+    Q('∫ 1/(x²−1) dx  —  first?', 'Partial fractions (or artanh form)', [
+      { html: 'u = x²−1', why: 'du=2x dx missing.' },
+      { html: 'Parts', why: 'Rational → PFD.' },
+      { html: 'Write as ∫ x² − 1', why: 'Broken algebra.' }
+    ], 'PFD recognition')
+  ],
+  fluency: [
+    Q('Protocol order', 'Rewrite → choose technique → skeleton antiderivative', [
+      { html: 'Technique before looking at rewrite', why: 'Rewrite often reveals the technique.' },
+      { html: 'Numeric approx first always', why: 'Structure course: symbolic order.' },
+      { html: 'Differentiate the answer before choosing a method', why: 'Checking is last, not first.' }
+    ], 'Integral protocol')
+  ]
+};
+
+const E19 = {
+  lexicon: [
+    Q('Σ a_n with a_n = r^n. First ID?', 'Geometric series structure', [
+      { html: 'Taylor with center 0 always', why: 'Recognize geometric first.' },
+      { html: 'Harmonic', why: 'Harmonic is 1/n.' },
+      { html: 'p-series with p=n', why: 'Wrong family.' }
+    ], 'Geometric ID'),
+    Q('Termwise differentiate a power series — next legality check?', 'Check radius / interval allows it', [
+      { html: 'Always legal everywhere', why: 'Need interior of interval of convergence.' },
+      { html: 'Never legal', why: 'Often legal inside radius.' },
+      { html: 'Only at endpoints', why: 'Endpoints are the delicate part; interior is safer.' }
+    ], 'Termwise rule')
+  ],
+  trapA: [
+    Q('Rearrange terms of a conditionally convergent series casually', 'Not safe — can change sum', [
+      { html: 'Always fine by commutativity', why: 'Infinite conditional ≠ finite commutativity.' },
+      { html: 'Only geometric is unsafe', why: 'Conditional is the classic trap.' },
+      { html: 'Safe if terms → 0', why: 'Necessary not sufficient.' }
+    ], 'Conditional rearrangement')
+  ],
+  trapB: [
+    Q('Taylor for f about a. Next structural pick?', 'Powers of (x−a), coefficients f^{(n)}(a)/n!', [
+      { html: 'Powers of x only always', why: 'Center a → (x−a).' },
+      { html: 'Coefficients f(a)/n only', why: 'Need nth derivative over n!.' },
+      { html: 'Geometric template for every f', why: 'Only special f match geometric.' }
+    ], 'Taylor skeleton')
+  ],
+  combine: [
+    Q('Geometric |r|<1 sums to…', 'a/(1−r) for first term a', [
+      { html: 'a/(1+r)', why: 'Sign in denominator.' },
+      { html: '1/(1−r) always ignoring first term', why: 'Track first term a.' },
+      { html: '∞', why: 'Only if |r|≥1 (and not special cases).' }
+    ], 'Geometric sum')
+  ],
+  dense: [
+    Q('Differentiate Σ x^n termwise', 'Σ n x^{n−1} (inside radius)', [
+      { html: 'Σ x^{n−1}', why: 'Missing factor n.' },
+      { html: 'Σ n x^n', why: 'Power drops by 1.' },
+      { html: 'Illegal always', why: 'Legal inside radius.' }
+    ], 'Termwise derivative')
+  ],
+  fluency: [
+    Q('Ratio test next reading?', 'Look at lim |a_{n+1}/a_n|', [
+      { html: 'Compare to integral first always', why: 'Ratio is its own protocol.' },
+      { html: 'Partial sums closed form first', why: 'Not required for convergence test.' },
+      { html: 'Rearrange then ratio', why: 'Do not rearrange first.' }
+    ], 'Ratio test structure')
+  ]
+};
+
+const E20 = {
+  lexicon: [
+    Q('∂f/∂x vs df/dx. Next literacy?', '∂: one variable at a time (others held fixed); d: total', [
+      { html: 'They always mean the same', why: 'Several variables: partial vs total differs.' },
+      { html: '∂ means discrete difference', why: 'Still a derivative, partial.' },
+      { html: 'd is illegal in multivariable', why: 'Total differential is used.' }
+    ], 'Partial vs total'),
+    Q('f(x,y). Compute ∂f/∂x. Next?', 'Treat y as constant', [
+      { html: 'Treat x as constant', why: 'Opposite.' },
+      { html: 'Replace y with x', why: 'No.' },
+      { html: 'Use chain with y(x) even when y independent', why: 'Only if y depends on x.' }
+    ], 'Hold the other fixed')
+  ],
+  trapA: [
+    Q('Chain: z=f(x,y), x=x(t), y=y(t). dz/dt?', 'f_x x′ + f_y y′', [
+      { html: 'f_x x′ only', why: 'Missing y path.' },
+      { html: 'f_x + f_y', why: 'Missing the inner derivatives.' },
+      { html: 'f′(t) as if single-variable', why: 'Need both paths.' }
+    ], 'Two-path chain')
+  ],
+  trapB: [
+    Q('Mixed partials f_{xy} vs f_{yx}', 'Equal when continuity conditions hold — check, don’t assume as first move', [
+      { html: 'Always unequal', why: 'Often equal under hypotheses.' },
+      { html: 'Always equal with no hypotheses', why: 'Need smoothness hypotheses.' },
+      { html: 'One is total derivative', why: 'Both partial.' }
+    ], 'Mixed partials')
+  ],
+  combine: [
+    Q('Implicit: F(x,y)=0. dy/dx structure?', '−F_x / F_y  (when F_y≠0)', [
+      { html: 'F_x / F_y', why: 'Missing minus.' },
+      { html: 'F_y / F_x', why: 'Reciprocal and sign care.' },
+      { html: 'Treat as ∂y/∂x = 0', why: 'y depends on x on the curve.' }
+    ], 'Implicit order')
+  ],
+  dense: [
+    Q('Related rates: A=πr², r=r(t). dA/dt?', '2πr · dr/dt', [
+      { html: '2πr only', why: 'Missing dr/dt.' },
+      { html: 'πr² · dr/dt', why: 'Derivative of r² is 2r r′.' },
+      { html: '2π dr/dt ignoring r', why: 'Product/chain on r².' }
+    ], 'Related rates chain')
+  ],
+  fluency: [
+    Q('Elite hangar: next legal move when many variables', 'Choose which variable is free; mark what is held fixed', [
+      { html: 'Differentiate everything w.r.t. everything at once', why: 'One axis at a time.' },
+      { html: 'Replace all ∂ with d', why: 'Loses holding-fixed information.' },
+      { html: 'Ignore dependencies', why: 'Dependency order is the skill.' }
+    ], 'Pick the axis')
+  ]
+};
+
+const BANKS = {
+  11: E11, 12: E12, 13: E13, 14: E14, 15: E15,
+  16: E16, 17: E17, 18: E18, 19: E19, 20: E20
+};
+
+function stageById(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
+
+function make(era, stageId) {
+  const bank = BANKS[era];
+  if (!bank) return Q('Coming soon', 'OK', ['Nope'], 'Stub');
+  const sid = stageId || 'lexicon';
+  const list = bank[sid] || bank.lexicon || [];
+  const base = pick(list);
+  // clone opts shuffled for display; keep ok flags
+  const opts = shuffle(base.opts.map(o => Object.assign({}, o)));
+  return { prompt: base.prompt, opts, era, stage: sid, move: (base.opts.find(o => o.ok) || {}).move };
+}
+
+G.FlightEngine = { STAGES, BANKS, make, stageById, eras: Object.keys(BANKS).map(Number) };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
 (function () {
 'use strict';
 const E = window.PrecEngine, $ = id => document.getElementById(id);
@@ -6015,23 +6741,61 @@ const OPS_LABEL = ['+', '+ −', '+ − ×', '+ − × ÷', 'x²', '7 ops'];
 /* ---------- Precedence eras (math title = gate; transport is visual-only). ----------
    engine: PrecEngine LEVELS index (1-based). Eras 5–10 are locked until later builds. */
 const ERAS = [
-  { n: 1, name: 'Sums', place: 'Mesa Verde cliffs', tease: '+ and −', example: '9 − 4 + 3', engine: 1, world: 'mesa', playable: true },
-  { n: 2, name: 'Products', place: 'Alexandria', tease: 'adds ×', example: '2 + 3 × 4', engine: 3, world: 'alexandria', playable: true },
-  { n: 3, name: 'Differences', place: 'desert West', tease: 'brackets change order', example: '(2 + 3) × 4', engine: 2, world: 'frontier', playable: true },
-  { n: 4, name: 'Quotients', place: 'gaslit Boston', tease: 'adds ÷ · ×÷ L→R', example: '12 ÷ 3 × 2', engine: 4, world: 'boston', playable: true },
-  { n: 5, name: 'Mixed operations', place: 'Detroit line', tease: 'mix all four', example: '18 − 6 ÷ 2 + 1', engine: null, world: 'detroit', playable: false },
-  { n: 6, name: 'Powers', place: 'Art Deco NY', tease: 'adds powers', example: '2 + 3²', engine: null, world: 'deco', playable: false },
-  { n: 7, name: 'Long chains', place: 'Route 66', tease: 'brackets + powers', example: '(1 + 2)² × 2', engine: null, world: 'route66', playable: false },
-  { n: 8, name: 'Nested', place: 'Neon coast', tease: 'nested brackets', example: '2 × (3 + (4 − 1))', engine: null, world: 'miami', playable: false },
-  { n: 9, name: 'Negatives', place: 'SF fog', tease: 'negatives', example: '−3 + 4 × (−2)', engine: null, world: 'sf', playable: false },
-  { n: 10, name: 'Fraction bars', place: '2040 neon city', tease: 'fraction bars', example: 'compound', engine: null, world: 'neo', playable: false, elite: true }
+  { n: 1, name: 'Sums', place: 'Mesa Verde cliffs', tease: '+ and −', example: '9 − 4 + 3', engine: 1, world: 'mesa', playable: true, wing: 'road' },
+  { n: 2, name: 'Products', place: 'Alexandria', tease: 'adds ×', example: '2 + 3 × 4', engine: 3, world: 'alexandria', playable: true, wing: 'road' },
+  { n: 3, name: 'Differences', place: 'desert West', tease: 'brackets change order', example: '(2 + 3) × 4', engine: 2, world: 'frontier', playable: true, wing: 'road' },
+  { n: 4, name: 'Quotients', place: 'gaslit Boston', tease: 'adds ÷ · ×÷ L→R', example: '12 ÷ 3 × 2', engine: 4, world: 'boston', playable: true, wing: 'road' },
+  { n: 5, name: 'Mixed operations', place: 'Detroit line', tease: 'mix all four', example: '18 − 6 ÷ 2 + 1', engine: null, world: 'detroit', playable: false, wing: 'road' },
+  { n: 6, name: 'Powers', place: 'Art Deco NY', tease: 'adds powers', example: '2 + 3²', engine: null, world: 'deco', playable: false, wing: 'road' },
+  { n: 7, name: 'Long chains', place: 'Route 66', tease: 'brackets + powers', example: '(1 + 2)² × 2', engine: null, world: 'route66', playable: false, wing: 'road' },
+  { n: 8, name: 'Nested', place: 'Neon coast', tease: 'nested brackets', example: '2 × (3 + (4 − 1))', engine: null, world: 'miami', playable: false, wing: 'road' },
+  { n: 9, name: 'Negatives', place: 'SF fog', tease: 'negatives', example: '−3 + 4 × (−2)', engine: null, world: 'sf', playable: false, wing: 'road' },
+  { n: 10, name: 'Fraction bars', place: '2040 neon city', tease: 'fraction bars', example: 'compound', engine: null, world: 'neo', playable: false, wing: 'road', elite: true },
+  /* Flight / Hangar — math titles; craft visual-only */
+  { n: 11, name: 'Grouping towers', place: 'Kitty Hawk dunes', tease: 'innermost ( ) | | √', example: '√|4−(1+2)|', engine: null, world: 'wright', playable: true, wing: 'flight', craft: 'wright' },
+  { n: 12, name: 'Fraction architecture', place: 'County fair sky', tease: 'which bar binds', example: 'complex fraction', engine: null, world: 'barnstorm', playable: true, wing: 'flight', craft: 'barnstorm' },
+  { n: 13, name: 'Composition order', place: 'Harbor at dusk', tease: 'f(g(h(x)))', example: '(f∘g)(x)', engine: null, world: 'clipper', playable: true, wing: 'flight', craft: 'clipper' },
+  { n: 14, name: 'Trig reading', place: 'Cruise altitude', tease: 'sin²x vs sin(x²)', example: 'sin⁻¹x', engine: null, world: 'turkey', playable: true, wing: 'flight', craft: 'turkey' },
+  { n: 15, name: 'Exp–log stacks', place: 'Silver tube', tease: 'log of power vs power of log', example: 'log(a^b)', engine: null, world: 'earlyjet', playable: true, wing: 'flight', craft: 'earlyjet' },
+  { n: 16, name: 'Limits structure', place: 'Mach haze', tease: 'factor → cancel → plug', example: 'lim (x²−4)/(x−2)', engine: null, world: 'concorde', playable: true, wing: 'flight', craft: 'concorde', stub: 'light' },
+  { n: 17, name: 'Derivative protocol', place: 'Night approach', tease: 'which rule next', example: 'd/dx[f(g(x))]', engine: null, world: 'glasscockpit', playable: true, wing: 'flight', craft: 'glass', stub: 'light' },
+  { n: 18, name: 'Integral protocol', place: 'High-G blue', tease: 'rewrite → technique', example: '∫ 2x(x²+1)⁵ dx', engine: null, world: 'fighter', playable: true, wing: 'flight', craft: 'fighter', stub: 'light' },
+  { n: 19, name: 'Series structure', place: 'Radar dark', tease: 'termwise legality', example: 'Σ rⁿ', engine: null, world: 'stealth', playable: true, wing: 'flight', craft: 'stealth', stub: 'light' },
+  { n: 20, name: 'Several variables', place: 'HUD reticles', tease: '∂ vs d · hold fixed', example: '∂f/∂x', engine: null, world: 'drone', playable: true, wing: 'flight', craft: 'drone', stub: 'light', elite: true }
 ];
 const ERA_STAMP = 10, ERA_CLEAR = 5; // clean problems → stamp; stamps → era cleared
+const FLIGHT_STAMP = 8, FLIGHT_CLEAR = 4; // denser stages: slightly tighter
 const eraOf = n => ERAS.find(e => e.n === n) || ERAS[0];
 const engineOfEra = n => { const e = eraOf(n); return e.engine || 1; };
+const Flt = window.FlightEngine;
+const flightStageId = () => (S.flightStage && Flt.STAGES.some(t => t.id === S.flightStage)) ? S.flightStage : 'lexicon';
+function craftSil(craft) {
+  // tiny inline SVG silhouettes — visual-only, never labeled as era titles
+  const paths = {
+    wright: '<path fill="currentColor" d="M2 18h28v2H2zm4-2 4-6h4l3 4h5l2 2H8l-2-2zm8-8 2-3h2l1 3h-5z"/>',
+    barnstorm: '<path fill="currentColor" d="M2 17h28v2H2zm3-3 5-5h4l2 3h6l2 2H10l-2-2zm10-7h3l1 2h-5l1-2z"/>',
+    clipper: '<path fill="currentColor" d="M1 18h30v2H1zm2-2 8-4h10l6 2v2H6l-2-1zm18-5 4-2 2 2-4 1-2-1z"/>',
+    turkey: '<path fill="currentColor" d="M1 18h30v2H1zm2-3 6-3h12l7 2v2H5l-1-1zm20-4h4v2h-4z"/>',
+    earlyjet: '<path fill="currentColor" d="M1 18h30v2H1zm3-3 10-2h10l6 1v2H6l-1-1zm16-3 5-1v2l-5 1v-2z"/>',
+    concorde: '<path fill="currentColor" d="M1 19h30v1H1zm2-3 18-6 9 4v2L20 15H4l-1-1z"/>',
+    glass: '<path fill="currentColor" d="M1 18h30v2H1zm2-3 8-2h12l7 1v2H5zm10-4h6l1 2h-8l1-2z"/>',
+    fighter: '<path fill="currentColor" d="M2 18h28v2H2zm10-2 2-8h4l2 8zm-8 0 8-3 2 1-6 2zm20 0-8-3-2 1 6 2z"/>',
+    stealth: '<path fill="currentColor" d="M2 19h28v1H2zm4-3 10-7 10 7-4 1H8l-2-1z"/>',
+    drone: '<path fill="currentColor" d="M14 14h4v4h-4zm-8-6h4v3H6zm16 0h4v3h-4zM10 8l4 4M22 8l-4 4M8 18h16v1H8z"/>'
+  };
+  const p = paths[craft] || paths.wright;
+  return `<svg class="sil" viewBox="0 0 32 22" aria-hidden="true">${p}</svg>`;
+}
 function eraUnlocked(n) {
   if (FR) return false;
   const e = eraOf(n); if (!e.playable) return false;
+  if (e.wing === 'flight') {
+    // Production gate: Era 10 cleared. Playtest: also openAll, or Era 4 cleared as interim road gate.
+    if (S.openAll) return true;
+    if (eraCleared(10)) return true;
+    if (eraCleared(4)) return true; // interim until Era 10 content ships
+    return true; // playtest open — Hangar note explains the eventual gate
+  }
   // MVP scaffold: eras 1–4 all open for play; stamps still track clears for UI
   return true;
 }
@@ -6041,9 +6805,11 @@ function eraCleanCount(n) { const s = S.eraStamps && S.eraStamps[n]; return s ? 
 function bumpEraClean(n) {
   if (!S.eraStamps) S.eraStamps = {};
   const s = S.eraStamps[n] || (S.eraStamps[n] = { clean: 0, stamps: 0 });
+  const need = eraOf(n).wing === 'flight' ? FLIGHT_STAMP : ERA_STAMP;
+  const clearNeed = eraOf(n).wing === 'flight' ? FLIGHT_CLEAR : ERA_CLEAR;
   s.clean++;
-  if (s.clean >= ERA_STAMP) { s.clean = 0; s.stamps++; }
-  if (s.stamps >= ERA_CLEAR) { if (!S.eraClear) S.eraClear = {}; S.eraClear[n] = true; }
+  if (s.clean >= need) { s.clean = 0; s.stamps++; }
+  if (s.stamps >= clearNeed) { if (!S.eraClear) S.eraClear = {}; S.eraClear[n] = true; }
 }
 const RALLY = { start: 40, perCp: 5, cpBonus: 20, cpMin: 8, penalty: 10 }; // seconds; expressions per checkpoint; the bonus shrinks by 2 s each checkpoint
 const FORKS = { perCp: 6, lanes: [2, 4, 8] }; // picks per checkpoint; lanes at checkpoints 0, 1, 2+ (the Texas superhighway)
@@ -6070,12 +6836,18 @@ function migrate() {
   for (const bag of ['stamps', 'abest']) { const o = S[bag], n = {}; for (const k in o) { const id = idOf(k) || k; n[id] = o[k]; } S[bag] = n; }
   for (const k in S.stamps) if (typeof S.stamps[k] === 'number') S.stamps[k] = { n: S.stamps[k], t: Date.now(), ever: S.stamps[k] >= 10 };
   for (const lic in S.alv) { const L = LV.LIC[lic]; if (L && S.alv[lic] > L.levels.length) S.alv[lic] = 1; }
-  if (!FR) { S.lic = 1; if (!S.era || S.era < 1 || S.era > 10) S.era = 1; if (!eraUnlocked(S.era)) S.era = 1; S.level = engineOfEra(S.era);
+  if (!FR) { S.lic = 1;
+    if (!S.wing || (S.wing !== 'road' && S.wing !== 'flight')) S.wing = 'road';
+    if (!S.era || S.era < 1 || S.era > 20) S.era = S.wing === 'flight' ? 11 : 1;
+    if (eraOf(S.era).wing !== S.wing) S.era = S.wing === 'flight' ? 11 : 1;
+    if (!eraUnlocked(S.era)) S.era = S.wing === 'flight' ? 11 : 1;
+    if (!S.flightStage) S.flightStage = 'lexicon';
+    S.level = engineOfEra(S.era);
     if (!S.eraStamps) S.eraStamps = {}; if (!S.eraClear) S.eraClear = {};
-    ['rally','forks'].forEach(m => { const a = S.bestKm[m] || []; while (a.length < 10) a.push(0); S.bestKm[m] = a; }); }
+    ['rally','forks'].forEach(m => { const a = S.bestKm[m] || []; while (a.length < 20) a.push(0); S.bestKm[m] = a; }); }
 }
 
-function blank() { return { v: 1, level: 1, era: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0,0,0,0,0,0,0,0,0,0], forks: [0,0,0,0,0,0,0,0,0,0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, eraStamps: {}, eraClear: {}, openAll: false }; }
+function blank() { return { v: 1, level: 1, era: 1, wing: 'road', flightStage: 'lexicon', best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: Array(20).fill(0), forks: Array(20).fill(0) }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, eraStamps: {}, eraClear: {}, openAll: false }; }
 function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); return Object.assign(b, o); } } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const RS = (lv, k) => { const id = lv + ':' + k; return S.rules[id] || (S.rules[id] = { right: 0, wrong: 0, t: [] }); };
@@ -6153,6 +6925,7 @@ function start(mode) {
   if (FR || S.lic !== 1) return aStart(mode);
   const era = eraOf(S.era || 1);
   if (!eraUnlocked(era.n)) return;
+  if (era.wing === 'flight') return fStart(mode);
   S.level = engineOfEra(era.n); save();
   ac();
   G = { mode, level: S.level, era: era.n, tier: mode === 'forks' ? 1 : 0, clean: 0, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], ruleHits: {}, missRules: {},
@@ -6326,8 +7099,31 @@ function solvedExpr() {
   else if (G.cpCount === per - 1) RD.on('checkpoint.near');
   hud(); G.busy = true; setTimeout(() => { G.busy = false; if (!G.over && !G.stalling) nextExpr(); }, 650);
 }
+function fFinish() {
+  if (!G || G.over) return; G.over = true; cancelAnimationFrame(raf); S.runs++;
+  const run = racing(), era = G.era || S.era || 11, acc = G.taps ? Math.round(100 * G.right / G.taps) : 0, mean = G.times.length ? G.times.reduce((a, b) => a + b, 0) / G.times.length : null;
+  let record = false; const bests = S.bestKm[G.mode === 'forks' ? 'forks' : 'rally'];
+  const bi = era - 1;
+  if (run && bests && G.dist > (bests[bi] || 0)) { bests[bi] = +G.dist.toFixed(2); record = true; }
+  save(); SND.end(); if (run) setTimeout(() => RD.stop(), 400);
+  $('vDone').classList.toggle('arcade', run);
+  $('rTitle').innerHTML = run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done';
+  $('rLine').textContent = run
+    ? `${G.solved} solved · ${acc}% right · best streak ${G.bestStreak} · ${fmt(mean)} a step`
+    : `Era ${era} · ${eraOf(era).name} · ${Flt.stageById(G.stage).name}: ${G.solved} solved, ${acc}% right.`;
+  $('rSolved').textContent = G.solved; $('rAcc').textContent = acc + '%'; $('rMed').textContent = fmt(med(G.times));
+  const next = ERAS.find(e => e.n === era + 1);
+  const cleared = eraCleared(era);
+  $('rNudge').innerHTML = cleared && next && next.wing === 'flight'
+    ? `<div class="nudge"><span>Era cleared. ${next.name} is open in the Hangar.</span></div>`
+    : (cleared ? `<div class="nudge"><span>Era cleared.</span></div>` : '');
+  const ws = Object.keys(G.whys || {}).sort((a, b) => G.whys[b] - G.whys[a]);
+  $('rRules').innerHTML = ws.slice(0, 3).map(w => `<div class="row"><span>${w}</span><span>×${G.whys[w]}</span></div>`).join('');
+  show('vDone');
+}
 function finish() {
   if (G && G.bench) return bFinish();
+  if (G && G.flight) return fFinish();
   if (G && G.alg) return aFinish();
   if (!G || G.over) return; G.over = true; cancelAnimationFrame(raf); S.runs++;
   const run = racing(), lv = G.level, era = G.era || S.era || 1, acc = G.taps ? Math.round(100 * G.right / G.taps) : 0, m = med(G.times), mean = G.times.length ? G.times.reduce((a, b) => a + b, 0) / G.times.length : null;
@@ -6399,6 +7195,85 @@ function levelById(id) { for (let lic = FR ? 0 : 2; lic <= LV.LAST; lic++) { if 
 /* ---------- licenses 2 to 9: pick the right next line ----------
    The card shows the line (and the last lines above it, faded); the signs below are candidate next lines.
    A sign is right when the checker says it means the same thing, so any equivalent move counts. */
+
+/* ---------- Flight wing: next-step protocol (card picks; arithmetic not the point) ---------- */
+function fStart(mode) {
+  ac();
+  const era = eraOf(S.era || 11);
+  if (!eraUnlocked(era.n)) return;
+  const stage = flightStageId();
+  G = { mode, flight: true, era: era.n, stage, tier: mode === 'forks' || mode === 'rally' ? 1 : 0, clean: 0, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], whys: {},
+    clock: RALLY.start * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false,
+    alg: { lic: 1, lv: 1, id: 'F' + era.n + '.' + stage, perCp: 4, k: 1.2 + 0.03 * (era.n - 11) } };
+  const run = mode !== 'practice';
+  $('signs').classList.add('alg'); $('expr').className = 'expr math';
+  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = !run; $('signs').hidden = false;
+  $('vPlay').classList.toggle('racing', run);
+  show('vPlay');
+  if (run) { RD.reset(); RD.setWorld(era.world || 'wright'); RD.setSpeed(0); RD.start(); } else RD.stop();
+  fNext(); if (run) loop();
+}
+function fNext() {
+  const st = Flt.stageById(G.stage);
+  G.prob = Flt.make(G.era, G.stage);
+  G.exprMiss = 0; G.stepT = performance.now(); G.fork = null;
+  $('card').classList.remove('done');
+  $('metaL').textContent = `Era ${G.era} · ${eraOf(G.era).name} · ${st.name}`;
+  $('metaR').textContent = racing() ? `checkpoint ${G.cp + 1}` : (eraOf(G.era).stub ? 'protocol · light' : 'protocol');
+  $('hint').innerHTML = G.solved ? '' : 'Pick the next legal move. Do not compute the value.';
+  fRender(); hud();
+}
+function fRender() {
+  const p = G.prob;
+  $('expr').innerHTML = `<span class="cur">${p.prompt}</span>`;
+  fit();
+  const all = p.opts, rights = all.filter(o => o.ok), wrongs = all.filter(o => !o.ok);
+  const n = racing() ? (G.mode === 'forks' ? FORKS.lanes[Math.min(G.cp, FORKS.lanes.length - 1)] : 3) : Math.min(4, all.length);
+  const keep = rights.slice(0, 1);
+  const opts = keep.concat(wrongs.slice(0, Math.max(1, n - 1)));
+  // shuffle display
+  for (let i = opts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = opts[i]; opts[i] = opts[j]; opts[j] = t; }
+  G.fork = { opts };
+  const s = $('signs'); s.style.gridTemplateColumns = `repeat(${Math.min(opts.length, 2)},minmax(0,1fr))`; s.dataset.n = opts.length;
+  s.innerHTML = opts.map((o, i) => `<button class="sign" data-i="${i}"><small>${i + 1}</small><span class="math">${o.html}</span></button>`).join('');
+  if (racing()) RD.on('fork', { lanes: opts.length });
+  G.stepT = performance.now();
+}
+function fPick(i) {
+  if (!G || !G.flight || G.over || G.busy || G.stalling || !G.fork) return;
+  const o = G.fork.opts[i], btn = document.querySelector(`.sign[data-i="${i}"]`); if (!o || o.used) return;
+  const ms = performance.now() - G.stepT; G.taps++;
+  if (o.ok) {
+    G.right++; G.cpSteps = (G.cpSteps || 0) + 1; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms); SND.right(G.streak);
+    if (racing()) { RD.on('decision.correct'); RD.on('fork.pick', { lane: i, ok: true }); }
+    btn.classList.add('right'); G.busy = true;
+    $('hint').innerHTML = `<span class="mv">✓ ${o.move || 'Right.'}</span>`;
+    setTimeout(() => { G.busy = false; if (G.over) return; fSolved(); }, 380);
+  } else {
+    G.misses++; G.exprMiss++; G.streak = 0; SND.miss(); G.whys[o.why] = (G.whys[o.why] || 0) + 1;
+    S.log.push({ d: new Date().toISOString(), m: G.mode, lv: 'F' + G.era + '.' + G.stage, x: G.prob.prompt, pick: o.html, r: 'miss' }); if (S.log.length > 300) S.log.shift();
+    if (racing()) { RD.on('decision.incorrect'); RD.on('fork.pick', { lane: i, ok: false }); G.speed *= 0.5; G.clock -= RALLY.penalty * 1000; const p = $('penalty'); p.textContent = '−' + RALLY.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+    const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    o.used = true; btn.classList.add('wrong'); btn.disabled = true;
+    G.fork.opts.forEach((x, k) => { if (x.ok) { const rb = document.querySelector(`.sign[data-i="${k}"]`); if (rb) { rb.classList.remove('hint'); void rb.offsetWidth; rb.classList.add('hint'); } } });
+    $('hint').innerHTML = `<span class="why">${o.why}</span> The glowing one is next.`;
+    G.stepT = performance.now();
+  }
+  save(); hud();
+}
+function fSolved() {
+  G.solved++; SND.solved(); G.fork = null; $('signs').innerHTML = '';
+  $('card').classList.add('done');
+  if (!$('hint').innerHTML) $('hint').innerHTML = G.exprMiss ? 'Solved.' : '<b>Clean.</b>';
+  if (!G.exprMiss && G.mode === 'practice') bumpEraClean(G.era);
+  if (G.mode === 'practice') { if (!G.exprMiss) { if (++G.clean >= 3) { G.tier = Math.min(2, G.tier + 1); G.clean = 0; } } else { G.clean = 0; } }
+  if (racing()) {
+    if (++G.cpCount >= G.alg.perCp) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, RALLY.cpBonus - 2 * (G.cp - 1)); G.clock += bonus * 1000; SND.checkpoint(); RD.on('checkpoint');
+      $('hint').innerHTML += ` <b>Checkpoint ${G.cp}!</b> +${bonus} seconds.`; }
+  }
+  hud(); G.busy = true; setTimeout(() => { G.busy = false; if (G.over || G.stalling) return; fNext(); }, 900);
+}
+
 const TEST_NAME = { road: 'Road test', renew: 'Renewal', pro: 'Pro test' };
 const akey = () => S.lic + '.' + (S.alv[S.lic] || 1);
 function aStart(mode, tune, test) {
@@ -6673,6 +7548,7 @@ function sample(lic, lv) { const k = lic + '.' + lv; if (!LV.ready(lic, lv)) ret
 function renderHome() {
   // Fractions app keeps the old bakery home; Precedence MVP is eras-only (Algebra Licenses wing hidden).
   if (FR) {
+    const wt=$('wingTabs'), sr=$('stageRow'), hn=$('hangarNote'); if (wt) wt.hidden=true; if (sr) sr.hidden=true; if (hn) hn.hidden=true;
     $('eraGarage').hidden = true; $('eraSel').hidden = true; $('plates').hidden = true;
     $('brand').innerHTML = `Fractions<small>BAKERY LANE · ${LV.LIC[0].levels.length} LEVELS</small>`;
     $('bench').hidden = false; renderBench();
@@ -6696,36 +7572,71 @@ function renderHome() {
     return;
   }
   S.lic = 1;
-  if (!S.era || !eraUnlocked(S.era)) S.era = 1;
+  if (!S.wing) S.wing = 'road';
+  if (!S.era || !eraUnlocked(S.era) || eraOf(S.era).wing !== S.wing) {
+    S.era = S.wing === 'flight' ? (ERAS.find(e => e.wing === 'flight' && eraUnlocked(e.n)) || { n: 11 }).n : 1;
+  }
   S.level = engineOfEra(S.era);
   const era = eraOf(S.era);
-  $('brand').innerHTML = `Precedence<small>TEN ERAS · ${ERAS.filter(e => e.playable).length} PLAYABLE</small>`;
+  const wing = S.wing === 'flight' ? 'flight' : 'road';
+  const playN = ERAS.filter(e => e.playable && e.wing === wing).length;
+  const wt0=$('wingTabs'); if (wt0) wt0.hidden=false;
+  $('brand').innerHTML = wing === 'flight'
+    ? `Precedence<small>HANGAR · FLIGHT ${playN} PLAYABLE</small>`
+    : `Precedence<small>ROAD · ${playN} PLAYABLE · TEN ERAS</small>`;
   $('plates').hidden = true; $('bench').hidden = true; $('eraGarage').hidden = false; $('eraSel').hidden = false;
-  $('licCard').hidden = true; $('levels').hidden = true; $('board').hidden = false; $('alv').hidden = true; $('ucBox').hidden = true;
+  $('licCard').hidden = true; $('levels').hidden = true; $('alv').hidden = true; $('ucBox').hidden = true;
   $('modes').hidden = false; $('goRally').hidden = false; $('tip').hidden = false;
   $('modes').style.gridTemplateColumns = '';
   $('licHead').innerHTML = '';
   $('goForks').querySelector('b').textContent = 'Forks';
-  $('eraGarage').innerHTML = ERAS.map(e => {
+  // wing tabs
+  const wt = $('wingTabs'); if (wt) {
+    wt.querySelectorAll('.wing-tab').forEach(b => b.setAttribute('aria-pressed', b.dataset.wing === wing ? 'true' : 'false'));
+  }
+  const hn = $('hangarNote'); if (hn) hn.hidden = wing !== 'flight';
+  const list = ERAS.filter(e => e.wing === wing);
+  $('eraGarage').classList.toggle('flight-grid', wing === 'flight');
+  $('eraGarage').innerHTML = list.map(e => {
     const open = eraUnlocked(e.n), cur = S.era === e.n, done = eraCleared(e.n);
-    const badge = !open ? 'SOON' : done ? 'CLEARED' : cur ? 'CURRENT' : '';
-    const cls = 'era-card' + (!open ? ' locked' : '') + (done ? ' cleared' : '') + (cur ? ' current' : '');
-    return `<button class="${cls}" data-era="${e.n}" role="tab" aria-pressed="${cur}" ${open ? '' : 'disabled'}><span class="en">ERA ${String(e.n).padStart(2,'0')}</span><b>${e.name}</b><span class="ep">${e.place}</span><span class="em">${open ? e.tease : 'Coming soon'}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
+    const badge = !open ? 'SOON' : done ? 'CLEARED' : cur ? 'CURRENT' : (e.stub ? 'LIGHT' : '');
+    const cls = 'era-card' + (wing === 'flight' ? ' flight' : '') + (!open ? ' locked' : '') + (done ? ' cleared' : '') + (cur ? ' current' : '');
+    const sil = wing === 'flight' && e.craft ? craftSil(e.craft) : '';
+    return `<button class="${cls}" data-era="${e.n}" role="tab" aria-pressed="${cur}" ${open ? '' : 'disabled'}><span class="en">ERA ${String(e.n).padStart(2,'0')}</span><b>${e.name}</b>${sil}<span class="ep">${e.place}</span><span class="em">${open ? e.tease : 'Coming soon'}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
   }).join('');
-  const eng = E.LEVELS[era.engine - 1];
+  const eng = era.engine ? E.LEVELS[era.engine - 1] : null;
   const stN = eraStampCount(era.n), clN = eraCleanCount(era.n);
-  $('eraSel').innerHTML = `<div class="eh"><b>${era.name}</b><span>ERA ${String(era.n).padStart(2,'0')} · engine ${eng ? eng.name : '—'}</span></div>
+  const stampNeed = wing === 'flight' ? FLIGHT_STAMP : ERA_STAMP;
+  const clearNeed = wing === 'flight' ? FLIGHT_CLEAR : ERA_CLEAR;
+  const stageLine = wing === 'flight'
+    ? `Stage · <b>${Flt.stageById(flightStageId()).name}</b> · ${era.stub ? 'light protocol bank' : 'full precalc bank'}`
+    : `engine ${eng ? eng.name : '—'}`;
+  $('eraSel').innerHTML = `<div class="eh"><b>${era.name}</b><span>ERA ${String(era.n).padStart(2,'0')} · ${stageLine}</span></div>
     <div class="eline">${era.tease} · e.g. <b>${era.example}</b></div>
-    <div class="eline">${eraCleared(era.n) ? 'Cleared.' : `Progress: ${stN}/${ERA_CLEAR} stamps · ${clN}/${ERA_STAMP} clean toward next stamp. Practice clears eras; Rally is for km.`}</div>`;
-  $('tip').innerHTML = "Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.";
-  // rules board columns = playable eras 1–4 mapped through their engine levels
-  const cols = ERAS.filter(e => e.playable);
-  let h = '<div></div>' + cols.map(e => `<div class="h">E${e.n}</div>`).join('');
-  RULES.forEach(r => { h += `<div class="rn">${r.name}</div>` + cols.map(e => { const L = ruleLevel(e.engine, r.k), na = e.engine === 1 && r.k !== 'brackets'; return `<div class="c${L ? ' l' + L : ''}" title="${r.name}, era ${e.n}"${na ? ' style="opacity:.35"' : ''}></div>`; }).join(''); });
-  $('rb').innerHTML = h;
-  const bk = m => S.bestKm[m][S.era - 1];
-  $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : 'Tap steps, drive far';
-  $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : '2, 4, then 8 lanes';
+    <div class="eline">${eraCleared(era.n) ? 'Cleared.' : `Progress: ${stN}/${clearNeed} stamps · ${clN}/${stampNeed} clean toward next stamp. Practice clears eras; Rally is for km.`}</div>`;
+  // stage chips for flight
+  const sr = $('stageRow');
+  if (sr) {
+    if (wing === 'flight' && era.playable) {
+      sr.hidden = false;
+      const curSt = flightStageId();
+      sr.innerHTML = Flt.STAGES.map(st => `<button class="stage-chip" data-stage="${st.id}" aria-pressed="${curSt === st.id}"><b>${st.name}</b>${st.id}</button>`).join('');
+    } else { sr.hidden = true; sr.innerHTML = ''; }
+  }
+  $('tip').innerHTML = wing === 'flight'
+    ? "Don't compute. <b>Pick the next legal structural move</b> — the calculator brain sits this one out."
+    : "Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.";
+  // rules board: road playable with engines only
+  $('board').hidden = wing === 'flight';
+  if (wing !== 'flight') {
+    const cols = ERAS.filter(e => e.playable && e.wing === 'road' && e.engine);
+    let h = '<div></div>' + cols.map(e => `<div class="h">E${e.n}</div>`).join('');
+    RULES.forEach(r => { h += `<div class="rn">${r.name}</div>` + cols.map(e => { const L = ruleLevel(e.engine, r.k), na = e.engine === 1 && r.k !== 'brackets'; return `<div class="c${L ? ' l' + L : ''}" title="${r.name}, era ${e.n}"${na ? ' style="opacity:.35"' : ''}></div>`; }).join(''); });
+    $('rb').innerHTML = h;
+  }
+  const bk = m => (S.bestKm[m] || [])[S.era - 1];
+  $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : (wing === 'flight' ? 'Tap moves, climb altitude' : 'Tap steps, drive far');
+  $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : (wing === 'flight' ? 'Pick the lane, fast' : '2, 4, then 8 lanes');
 }
 function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage'].forEach(x => $(x).hidden = x !== v); if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); }
 function renderGarage() {
@@ -6747,13 +7658,15 @@ function renderSet() { renderLog(); $('openAll').textContent = S.openAll ? 'Lock
 /* ---------- wiring ---------- */
 $('expr').addEventListener('click', e => { const b = e.target.closest('.op'); if (b) tap(+b.dataset.id); });
 $('plates').addEventListener('click', e => { const b = e.target.closest('.plate'); if (!b) return; S.lic = +b.dataset.lic; save(); renderHome(); });
-$('eraGarage').addEventListener('click', e => { const b = e.target.closest('.era-card'); if (!b || b.disabled) return; const n = +b.dataset.era; if (!eraUnlocked(n)) return; S.era = n; S.level = engineOfEra(n); save(); renderHome(); });
+$('wingTabs').addEventListener('click', e => { const b = e.target.closest('.wing-tab'); if (!b) return; S.wing = b.dataset.wing; const first = ERAS.find(er => er.wing === S.wing && eraUnlocked(er.n)); S.era = first ? first.n : (S.wing === 'flight' ? 11 : 1); S.level = engineOfEra(S.era); save(); renderHome(); });
+$('stageRow').addEventListener('click', e => { const b = e.target.closest('.stage-chip'); if (!b) return; S.flightStage = b.dataset.stage; save(); renderHome(); });
+$('eraGarage').addEventListener('click', e => { const b = e.target.closest('.era-card'); if (!b || b.disabled) return; const n = +b.dataset.era; if (!eraUnlocked(n)) return; S.era = n; S.wing = eraOf(n).wing || 'road'; S.level = engineOfEra(n); save(); renderHome(); });
 $('alv').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; S.alv[S.lic] = +b.dataset.v; save(); renderHome(); });
 $('levels').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; S.level = +b.dataset.l; save(); renderHome(); });
 $('goPractice').addEventListener('click', () => start('practice'));
 $('goRally').addEventListener('click', () => start('rally'));
 $('goForks').addEventListener('click', () => start(S.lic !== 1 ? 'race' : 'forks'));
-$('signs').addEventListener('click', e => { const b = e.target.closest('.sign'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i); });
+$('signs').addEventListener('click', e => { const b = e.target.closest('.sign'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.flight) fPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i); });
 $('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
@@ -6773,7 +7686,7 @@ $('copyLog').addEventListener('click', () => { const t = JSON.stringify(S.log, n
   if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, () => $('logMsg').textContent = 'Copy blocked here.'); else $('logMsg').textContent = 'Copy blocked here.'; });
 $('sndBtn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSnd(); if (S.sound) SND.solved(); });
 $('thmBtn').addEventListener('click', () => { S.theme = isDark() ? 'light' : 'dark'; save(); applyTheme(); if (!$('vSet').hidden) renderSet(); });
-window.__prec = { S: () => S, G: () => G, tap, pick, aPick, bPick, bStart, bLevel, BENCH, E, RD, A, LV, stampOf, tuneUp, hotParts };
+window.__prec = { S: () => S, G: () => G, tap, pick, aPick, bPick, fPick, bStart, bLevel, BENCH, E, RD, A, LV, Flt, stampOf, tuneUp, hotParts };
 applyTheme(); renderSnd(); show('vHome');
 })();
 </script>

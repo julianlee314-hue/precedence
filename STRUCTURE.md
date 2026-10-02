@@ -58,7 +58,7 @@ Cleopatra: Era 2 UI is titled **Products**. The royal litter and Cleopatra liken
 | Powers on for Era 6+ | Deferred (`POWERS = false`) |
 | Attract screen without Miami spoilers | Not touched |
 | Gate eras 2–4 behind prior CLEARED | Optional; currently all of 1–4 open |
-| GitHub Pages repo `precedence` | Not pushed (per Julius) |
+| GitHub Pages repo `precedence` | Live on Pages |
 | Algebra Licenses sister wing on home | Hidden |
 
 ## Art still needed (vehicles)
@@ -81,3 +81,25 @@ Later (pre–1.0): Mixed operations → Powers → Long chains → **Nested (Era
 - `build.py` — title replace strings for Fractions twin  
 - `docs/STRUCTURE.md` (this file)  
 - Design lock: `docs/PRECEDENCE_ERA_UNLOCK_MAP.md`
+
+
+## Flight / Hangar wing (Eras 11–20)
+
+Shipped 3 Oct 2026 playtest: separate **Hangar** tab on home. Math titles only; craft SVG silhouettes are visual-only.
+
+| Era | Math title | Craft (visual) | Content |
+|---:|---|---|---|
+| 11 | Grouping towers | Wright Flyer | Full protocol bank |
+| 12 | Fraction architecture | Barnstormer | Full protocol bank |
+| 13 | Composition order | Clipper | Full protocol bank |
+| 14 | Trig reading | 1950s airliner | Full protocol bank |
+| 15 | Exp–log stacks | Early jet | Full protocol bank |
+| 16 | Limits structure | Concorde | Light stub bank |
+| 17 | Derivative protocol | Glass cockpit | Light stub bank |
+| 18 | Integral protocol | Fighter | Light stub bank |
+| 19 | Series structure | Stealth | Light stub bank |
+| 20 | Several variables | Drone swarm | Light stub bank |
+
+Stages (6): Lexicon · Trap A · Trap B · Combine · Dense · Fluency. Loop: pick next legal structural move (card signs). Stamps: 8 clean → stamp, 4 stamps → cleared.
+
+Unlock note: curriculum gate is Era 10 cleared; playtest opens Hangar eras. Road eras 1–10 unchanged (Cleopatra / Miami rules intact).

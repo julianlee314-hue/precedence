@@ -8,7 +8,9 @@ Working title: **Precedence**. Scope of this doc: the **order-of-operations race
 
 ## 1. Design thesis
 
-**Vehicle = rank. Math = the gate. Road world = the souvenir.**
+**Math title = the gate. Transport = visual-only reward. Road world = the souvenir.**
+
+The garage, HUD, and select screens label each era with its math title; the player reads the transport progression from the art, not from words.
 
 You never buy a car. You earn how you move. New players always start **on foot**. The Miami wedge / 80s burnout is **Era 8**, not the default skin and not the attract-screen spoiler on a fresh install.
 
@@ -25,18 +27,18 @@ Practice has no clock. Rally / Race is where speed and the vehicle fantasy matte
 
 ## 2. The ten eras (unlock table)
 
-| Era | Vehicle | Place / vibe | New math rule | Example | Suggested Mathera skills | Earn condition (MVP proposal) |
-|---:|---|---|---|---|---|---|
-| **1** | On foot | c. 1200 · Mesa Verde cliffs | `+` and `−` only; brackets from day one | `9 − 4 + 3`, `8 + (5 + 2)` | II.8.01, III.4.03 | Stamp Practice ×10 clean **or** clear Rally checkpoint pack |
-| **2** | Royal litter | 40 BC · Cleopatra / Alexandria | adds `×` (× before +−) | `2 + 3 × 4` | II.8.01, II.8.03, III.4.03 | Same |
-| **3** | Horseback | 1860s · desert West | brackets change order | `(2 + 3) × 4` | II.8.01, II.8.03, III.4.03 | Same |
-| **4** | Carriage | 1850s · gaslit Boston | adds `÷`; `×÷` left to right | `12 ÷ 3 × 2` | II.8.01, II.8.03, III.4.03 | Same |
-| **5** | Model T | 1913 · Detroit line | mixes all four freely | `18 − 6 ÷ 2 + 1` | II.8.01, II.8.03, III.4.03 | Same + short **road test** (12 mixed, 1 slip OK) → unlock Era 6 |
-| **6** | Streamliner | 1935 · Art Deco NY | adds powers | `2 + 3²` | II.8.01, II.8.03, III.1.08?, III.4.03 | Same |
-| **7** | Fifties cruiser | 1957 · Route 66 diner | brackets with powers | `(1 + 2)² × 2` | same family | Same |
-| **8** | **Wedge sports car** | 1986 · Miami sunset | nested brackets | `2 × (3 + (4 − 1))` | same family | **Burnout unlock** — feel this as the fantasy payoff |
-| **9** | Electric | Today · SF fog | negatives | `−3 + 4 × (−2)` | extend Ops / integers | Same |
-| **10** | Robotaxi | 2040 · neon city | fraction bars + everything | compound | hand-off toward Fractions app / III fraction ops | Elite plate; optional Pro ★ |
+| Era | Math title (UI) | Visual-only transport | Place / vibe | New math rule | Example | Suggested Mathera skills | Earn condition (MVP proposal) |
+|---:|---|---|---|---|---|---|---|
+| **1** | **Sums** | on foot | c. 1200 · Mesa Verde cliffs | `+` and `−` only; brackets from day one | `9 − 4 + 3`, `8 + (5 + 2)` | II.8.01, III.4.03 | Stamp Practice ×10 clean **or** clear Rally checkpoint pack |
+| **2** | **Products** | royal litter / Cleopatra look | 40 BC · Cleopatra / Alexandria | adds `×` (× before +−) | `2 + 3 × 4` | II.8.01, II.8.03, III.4.03 | Same |
+| **3** | **Differences** | horseback | 1860s · desert West | brackets change order | `(2 + 3) × 4` | II.8.01, II.8.03, III.4.03 | Same |
+| **4** | **Quotients** | horse-drawn carriage | 1850s · gaslit Boston | adds `÷`; `×÷` left to right | `12 ÷ 3 × 2` | II.8.01, II.8.03, III.4.03 | Same |
+| **5** | **Mixed operations** | early car | 1913 · Detroit line | mixes all four freely | `18 − 6 ÷ 2 + 1` | II.8.01, II.8.03, III.4.03 | Same + short **road test** (12 mixed, 1 slip OK) → unlock Era 6 |
+| **6** | **Powers** | streamliner | 1935 · Art Deco NY | adds powers | `2 + 3²` | II.8.01, II.8.03, III.1.08?, III.4.03 | Same |
+| **7** | **Long chains** | 1950s cruiser | 1957 · Route 66 diner | brackets with powers | `(1 + 2)² × 2` | same family | Same |
+| **8** | **Nested** | wedge sports car | 1986 · Miami sunset | nested brackets | `2 × (3 + (4 − 1))` | same family | **Burnout unlock** — feel this as the fantasy payoff |
+| **9** | **Negatives** | electric vehicle | Today · SF fog | negatives | `−3 + 4 × (−2)` | extend Ops / integers | Same |
+| **10** | **Fraction bars** | robotaxi | 2040 · neon city | fraction bars + everything | compound | hand-off toward Fractions app / III fraction ops | Elite plate; optional Pro ★ |
 
 **Notes on chronology:** eras are ordered by *how you travel*, not strict history. Horse (1860s) before Carriage (1850s) is intentional fantasy rank, not a textbook timeline. Keep the postcard copy playful, not a museum lecture.
 

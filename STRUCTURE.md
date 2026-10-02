@@ -2,11 +2,11 @@
 
 *Math Sensei · 3 Oct 2026 · scaffold before content polish*
 
-Working title: **Precedence**. Algebra Licenses wing is **hidden** on the Precedence home. Fractions remains a separate build (`PREC_APP = 'fractions'`).
+Working title: **Precedence**. Algebra Licenses wing is **hidden** on the Precedence home. **Era labels are math titles; vehicles are visual-only rewards.** Fractions remains a separate build (`PREC_APP = 'fractions'`).
 
 ## What shipped in this scaffold
 
-1. User-facing rename: title / brand → **Precedence** (“TEN ERAS OF GETTING AROUND”).
+1. User-facing rename: title / brand → **Precedence** (“TEN ERAS OF GETTING AROUND”). The garage and HUD use **math titles**; transport is visual-only road art.
 2. Home = **era garage postcards** (10 eras). Dense algebra plate strip removed from Precedence UI.
 3. **Eras 1–4 playable** via existing `PrecEngine` generators. Eras 5–10 show **Coming soon** (locked).
 4. Practice bumps era stamps (10 clean → 1 stamp; 5 stamps → CLEARED). Rally stores best km per era. Clearing does not yet gate eras 1–4 (all four open for playtesting).
@@ -17,22 +17,22 @@ Build: from `mathera-games/games/precedence/` run `python3 build.py` → `dist/p
 
 ## Era → engine mapping
 
-| Era | Vehicle (UI name) | Place tease | Engine level | Generator name | Ops focus |
-|---:|---|---|---:|---|---|
-| 1 | On foot | Mesa Verde cliffs | **1** | Sums | `+` (+ brackets) |
-| 2 | Royal litter | Alexandria | **3** | Products | adds `×` |
-| 3 | Horseback | desert West | **2** | Differences | brackets / `+ −` mix (closest bracket drill) |
-| 4 | Carriage | gaslit Boston | **4** | Quotients | adds `÷`, `×÷` L→R |
-| 5 | Model T | Detroit | — | *stub* | mix all four + road test |
-| 6 | Streamliner | Art Deco NY | — | *stub* | powers (`POWERS` still false globally) |
-| 7 | Fifties cruiser | Route 66 | — | *stub* | brackets + powers |
-| 8 | Wedge sports car | Miami | — | *stub* | nested brackets — **1.0 fantasy** |
-| 9 | Electric | SF fog | — | *stub* | negatives |
-| 10 | Robotaxi | 2040 | — | *stub* | fraction bars / elite |
+| Era | Math title (UI) | Visual-only transport | Place tease | Engine level | Generator / math focus |
+|---:|---|---|---|---:|---|
+| 1 | **Sums** | on foot | Mesa Verde cliffs | **1** | `+` (+ brackets) |
+| 2 | **Products** | royal litter / Cleopatra look | Alexandria | **3** | adds `×` |
+| 3 | **Differences** | horseback | desert West | **2** | brackets / `+ −` mix (closest bracket drill) |
+| 4 | **Quotients** | horse-drawn carriage | gaslit Boston | **4** | adds `÷`, `×÷` L→R |
+| 5 | **Mixed operations** | early car | Detroit | — | mix all four + road test |
+| 6 | **Powers** | streamliner | Art Deco NY | — | powers (`POWERS` still false globally) |
+| 7 | **Long chains** | 1950s cruiser | Route 66 | — | brackets + powers |
+| 8 | **Nested** | wedge sports car | neon coast | — | nested brackets — **1.0 fantasy** |
+| 9 | **Negatives** | electric vehicle | SF fog | — | negatives |
+| 10 | **Fraction bars** | robotaxi | 2040 | — | fraction bars / elite |
 
 **Why Era 2 → L3 and Era 3 → L2?** Matches the unlock map: × arrives before a dedicated brackets-emphasis band. Engine L2 is the closest live “brackets change order” drill without writing new generators yet.
 
-Cleopatra: Era 2 UI says **Royal litter** / Alexandria only — **no name label**. Pixel likeness for the litter ride is still TODO (see art list).
+Cleopatra: Era 2 UI is titled **Products**. The royal litter and Cleopatra likeness are visual-only — **no transport label or name copy**. Pixel likeness for the litter ride is still TODO (see art list).
 
 ## Save shape (Precedence)
 
@@ -72,7 +72,7 @@ Priority for “playable through the 4th” feeling finished:
 
 Concept-art reference: `games/racer/concept-art.html` (`VEH.foot|litter|horse|carriage` + vistas). Port those side-view drawers into `road.js` `car()` (or a `vehicle()` switch on `st.world` / era).
 
-Later (pre–1.0): Model T → Streamliner → Cruiser → **Miami wedge (Era 8)** → EV → Robotaxi.
+Later (pre–1.0): Mixed operations → Powers → Long chains → **Nested (Era 8)** → Negatives → Fraction bars. The transport visuals evolve separately, with the Era 8 neon sports-car treatment reserved for 1.0.
 
 ## Files touched
 
